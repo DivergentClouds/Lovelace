@@ -14,7 +14,7 @@
    - If an instruction's result is a value this flag is set to bit 7 of that value.
  - `carry` `0x000000`
    - Carry Flag
-   - After an addition or subtraction instruction, set to 1 if the 9th bit would have been 1.
+   - After an addition or subtraction instruction, set if the 9th bit would have been 1.
  - `interrupt` `00x00000`
    - Interrupt Disable Flag
    - Is only manually set. Determines whether or not interrupts happen.
