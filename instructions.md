@@ -9,18 +9,26 @@
 - `acc` 8-bit accumulator
 - `sp` 8-bit stack pointer
 - `flags` 8-bit flags register
- - `S` `x0000000`
+ - `sign` `x0000000`
    - Sign Flag
    - If an instruction's result is a value this flag is set to bit 7 of that value.
- - `C` `0x000000`
+ - `carry` `0x000000`
    - Carry Flag
    - After an addition or subtraction instruction, set to 1 if the 9th bit would have been 1.
- - `I` `00x00000`
+ - `interrupt` `00x00000`
    - Interrupt Disable Flag
    - Is only manually set. Determines whether or not interrupts happen.
- - `overflow`  `00x00000`
- - `greater`   `000000x0`
- - `zero`      `0000000x`
+ - `overflow` `000x0000`
+   - Overflow Flag
+   - Indicates that signed integer overflow occurred.
+ - `greater` `000000x0`
+   - Greater than flag
+   - Set if the last `cmp` instruction found a positive difference, otherwise it is cleared.
+ - `zero` `0000000x`
+   - Zero flag
+   - If an instruction's result is a value this flag is set if that value is 0, otherwise it is cleared.
+   - Set if the last `cmp` instruction found no difference, otherwise it is cleared.
+
 
 A "value register" is either a general register or the accumulator.
 
@@ -75,8 +83,13 @@ Data movement operations are in the form `{source}, {destination}`.
 
 ### Jump instructions (38 opcodes)
 
-- `cmp {value register}, {value register}` (1 byte, 1 cycle, 20 opcodes)
+- `dif {value register}, {value register}` (1 byte, 1 cycle, 20 opcodes)
 - `cmp {value register}, {literal}` (2 bytes, 2 cycles, 5 opcodes)
 - `bra {flag}, {address}` (3 bytes, 3 cycles, 6 opcodes)
 - `brn {flag}, {address}` (3 bytes, 3 cycles, 6 opcodes)
 - `jmp {address}` (3 bytes, 3 cycles, 1 opcode)
+
+### Flag instructions (12 opcodes)
+
+- `set {flag}` (1 byte, 1 cycle, 6 opcodes)
+- `clear {flag}` (1 byte, 1 cycle, 6 opcodes)
