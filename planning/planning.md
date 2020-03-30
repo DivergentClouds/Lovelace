@@ -33,7 +33,7 @@ The design should be plausible for real implementation.
 
 ### Graphics
 
-EGA, perhaps reference DOSBox for implementation.
+EGA-like, perhaps reference DOSBox for implementation.
 Modes are switchable.
 
 The CPU renders into a memory framebuffer which moves over a cable to a screen.

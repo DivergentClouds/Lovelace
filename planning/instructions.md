@@ -69,10 +69,11 @@ Data movement operations are in the form `{source}, {destination}`.
 - `inc {value register}` (1 byte, 1 cycle, 5 opcodes)
 - `dec {value register}` (1 byte, 1 cycle, 5 opcodes)
 
-### Subroutine instructions (2 opcodes)
+### Subroutine instructions (3 opcodes)
 
 - `jsr {address}` (3 bytes, 6 cycles, pushes 2)
-- `ret` (1 byte, 4 cycles, pops 2) (also works for interrupts)
+- `ret` (1 byte, 4 cycles, pops 2)
+- `reti` (1 byte, 5 cycles, pops 3)
 
 ### Stack instructions (12 opcodes)
 
@@ -83,7 +84,7 @@ Data movement operations are in the form `{source}, {destination}`.
 
 ### Jump instructions (38 opcodes)
 
-- `dif {value register}, {value register}` (1 byte, 1 cycle, 20 opcodes)
+- `cmp {value register}, {value register}` (1 byte, 1 cycle, 20 opcodes)
 - `cmp {value register}, {literal}` (2 bytes, 2 cycles, 5 opcodes)
 - `bra {flag}, {address}` (3 bytes, 3 cycles, 6 opcodes)
 - `brn {flag}, {address}` (3 bytes, 3 cycles, 6 opcodes)
