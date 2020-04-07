@@ -27,7 +27,7 @@ typedef struct {
 
 typedef union {
 	oscillator_t oscillator;
-	uint8_t registers[12];
+	uint8_t registers[8];
 } oscillator_u;
 
 oscillator_u oscillators[3];
@@ -74,11 +74,16 @@ float noise_wave();
 
 float render_oscillator(uint8_t n);
 
-// -2 * cos(0.75 * pi) / pi
-const float butterworth_const = 0.45015815807855303f;
+// -2 * cos(7 / 8 * pi) / pi
+const float butterworth_const_1 = 0.5881599776824028f;
+// -2 * cos(5 / 8 * pi) / pi
+const float butterworth_const_2 = 0.24362383960110814f;
 
 // 1 / pi / pi
 const float reciprocal_pi_squared = 0.10132118364233778f;
+
+// 1 / pi
+const float reciprocal_pi = 0.3183098861837907f;
 
 typedef struct biquad_s {
 	float x1;
@@ -88,7 +93,10 @@ typedef struct biquad_s {
 } biquad_t;
 
 biquad_t lowpass_state[6];
-float lowpass(float sample, uint8_t n, uint8_t osc);
+biquad_t highpass_state[6];
+
+float lowpass(float sample, uint8_t n, uint8_t osc, float butterworth_const);
+float highpass(float sample, uint8_t n, uint8_t osc, float butterworth_const);
 
 void audio_callback(void *data, Uint8 *stream, int len);
 
