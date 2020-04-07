@@ -109,8 +109,8 @@ float lowpass(float sample, uint8_t n, uint8_t osc, float butterworth_const) {
 	float c2;
 	float a0;
 
-	cutoff = oscillators[osc].oscillator.low / 128.0 * (20000.0 / SAMPLE_RATE);
-	cutoff = (cutoff * cutoff) / 2;
+	cutoff = oscillators[osc].oscillator.low / 256.0;
+	cutoff = (cutoff * cutoff) * (20000.0 / SAMPLE_RATE);
 	cutoff = reciprocal_pi * atanf(cutoff * M_PI);
 	butterworth_const *= cutoff;
 	c2 = cutoff * cutoff;
@@ -141,8 +141,8 @@ float highpass(float sample, uint8_t n, uint8_t osc, float butterworth_const) {
 	float c2;
 	float a0;
 
-	cutoff = oscillators[osc].oscillator.high / 128.0 * (20000.0 / SAMPLE_RATE);
-	cutoff = (cutoff * cutoff) / 2;
+	cutoff = oscillators[osc].oscillator.high / 256.0;
+	cutoff = (cutoff * cutoff) * (20000.0 / SAMPLE_RATE);
 	cutoff = reciprocal_pi * atanf(cutoff * M_PI);
 	butterworth_const *= cutoff;
 	c2 = cutoff * cutoff;
