@@ -3,20 +3,20 @@
 # Harriet
 
 - 3 oscillators
- - 2 filters
+ - 2 Butterworth filters
    - Highpass
      - `cccccccc`
      - 256 cutoffs
    - Lowpass
      - `cccccccc`
      - 256 cutoffs
- - ADSR
-   - `aaaaaaaa dddddddd`
-   - `ssssssss rrrrrrrr`
-   - 256 different length options for each
  - Waveform
    - `000000aa` `bbbbbbbb`
    - a is waveform selection, 4 waveforms
+     - pulse
+     - saw
+     - triangle
+     - noise
    - b is pulse width
  - Note/pitch
    - `0nnnnnnn`
@@ -29,3 +29,14 @@
  - Volume
    - `vvvvvvvv`
    - 256 volume levels
+- Pins
+ - 6 address pins
+   - 2 oscillator select pins
+   - 4 register select pins
+ - 8 data pins
+ - clock pin
+ - read/write pin
+   - read high
+   - write low
+ - audio out pin
+ - reset pin
