@@ -4,7 +4,7 @@
 
 void reset_registers() {
 	for (int osc = 0; osc < 3; osc++) {
-		for (int reg = 0; reg < 12; reg++) {
+		for (int reg = 0; reg < 8; reg++) {
 			oscillators[osc].registers[reg] = 0;
 		}
 	}
@@ -70,21 +70,33 @@ float render_oscillator(uint8_t n) {
 		return pulse_wave(fmod(phases[n] +
 			oscillators[n].oscillator.phase / 256.0, 1),
 			oscillators[n].oscillator.width)
-			* (oscillators[n].oscillator.volume / 255.0);
+			* smooth_volume[n];
 	else if (oscillators[n].oscillator.waveform == 0b01)
 		return saw_wave(fmod(phases[n] +
 			oscillators[n].oscillator.phase / 256.0, 1))
-			* (oscillators[n].oscillator.volume / 255.0);
+			* smooth_volume[n];
 	else if (oscillators[n].oscillator.waveform == 0b10)
 		return triangle_wave(fmod(phases[n] +
 			oscillators[n].oscillator.phase / 256.0, 1))
-			* (oscillators[n].oscillator.volume / 255.0);
+			* smooth_volume[n];
 	else // 0b11
 		return noise_wave()
-		* (oscillators[n].oscillator.volume / 255.0);
+		* smooth_volume[n];
 }
 
 void generate_sample() {
+	for (int i = 0; i < 3; i++)
+		smooth_volume[i] = (smooth_volume[i] * 19 +
+				oscillators[i].oscillator.volume / 255.0) / 20;
+
+	for (int i = 0; i < 3; i++)
+		smooth_low[i] = (smooth_low[i] * 199 +
+				oscillators[i].oscillator.low / 255.0) / 200;
+
+	for (int i = 0; i < 3; i++)
+		smooth_high[i] = (smooth_high[i] * 199 +
+				oscillators[i].oscillator.high / 255.0) / 200;
+
 	pins.pins.out = 0;
 	pins.pins.out += highpass(highpass(lowpass(lowpass(render_oscillator(0),
 		0, 0, butterworth_const_1),
@@ -109,7 +121,7 @@ float lowpass(float sample, uint8_t n, uint8_t osc, float butterworth_const) {
 	float c2;
 	float a0;
 
-	cutoff = oscillators[osc].oscillator.low / 256.0;
+	cutoff = smooth_low[osc];
 	cutoff = (cutoff * cutoff) * (20000.0 / SAMPLE_RATE);
 	cutoff = reciprocal_pi * atanf(cutoff * M_PI);
 	butterworth_const *= cutoff;
@@ -141,7 +153,7 @@ float highpass(float sample, uint8_t n, uint8_t osc, float butterworth_const) {
 	float c2;
 	float a0;
 
-	cutoff = oscillators[osc].oscillator.high / 256.0;
+	cutoff = smooth_high[osc];
 	cutoff = (cutoff * cutoff) * (20000.0 / SAMPLE_RATE);
 	cutoff = reciprocal_pi * atanf(cutoff * M_PI);
 	butterworth_const *= cutoff;
@@ -171,7 +183,7 @@ void audio_callback(void *data, Uint8 *stream, int len) {
 	float *fstream;
 
 	fstream = (float *) stream;
-	for (int i = 0; i < 256; i++) {
+	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++) {
 		generate_sample();
 		fstream[i] = pins.pins.out;
 	}
@@ -185,7 +197,7 @@ SDL_AudioDeviceID initialise_audio() {
 	want.freq = SAMPLE_RATE;
 	want.format = AUDIO_F32;
 	want.channels = 1;
-	want.samples = 256;
+	want.samples = AUDIO_BUFFER_SIZE;
 	want.callback = audio_callback;
 	dev = SDL_OpenAudioDevice(NULL, 0, &want, &have,
 		SDL_AUDIO_ALLOW_FORMAT_CHANGE);
@@ -193,10 +205,13 @@ SDL_AudioDeviceID initialise_audio() {
 	return dev;
 }
 
+const uint8_t scale[7] = {0, 2, 4, 5, 7, 9, 11};
+
 int main(int argc, char const **argv) {
 	SDL_AudioDeviceID dev;
 
 	reset_registers();
+	reset_pins();
 	srand(0x7EA75);
 
 	// play audio
@@ -212,23 +227,117 @@ int main(int argc, char const **argv) {
 
 	// generate audio
 
-	oscillators[0].oscillator.volume = 60;
-	oscillators[0].oscillator.width = 128;
+	// for (int i = 0; i < 1; i++) {
+	// 	oscillators[i].oscillator.volume = 100;
+	// 	oscillators[i].oscillator.width = 128;
+	// 	oscillators[i].oscillator.waveform = 0b10;
+	// 	oscillators[i].oscillator.note = 30;
+	// 	oscillators[i].oscillator.low = 254;
+	// }
+
 	oscillators[0].oscillator.waveform = 0b00;
-	oscillators[0].oscillator.note = 37;
+	oscillators[0].oscillator.volume = 25;
+	oscillators[0].oscillator.high = 0;
+	oscillators[0].oscillator.low = 90;
+	oscillators[0].oscillator.width = 128;
 
-	for (uint8_t i = 1; i < 127; i++) {
-		oscillators[0].oscillator.low = 180 - i;
-		oscillators[0].oscillator.high = i;
-		SDL_Delay(8);
-	}
+	oscillators[1].oscillator.waveform = 0b00;
+	oscillators[1].oscillator.volume = 25;
+	oscillators[1].oscillator.high = 0;
+	oscillators[1].oscillator.low = 128;
+	oscillators[1].oscillator.width = 128;
 
-	for (uint8_t i = 127; i > 1; i--) {
-		oscillators[0].oscillator.low = 180 - i;
-		oscillators[0].oscillator.high = i;
-		SDL_Delay(8);
-	}
+	oscillators[1].oscillator.note = 38;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
 
+	oscillators[1].oscillator.note = 45;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 47;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 48;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 45;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+
+	oscillators[1].oscillator.note = 47;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 48;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 50;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 47;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+
+	oscillators[1].oscillator.note = 48;
+	SDL_Delay(500);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(100);
+	oscillators[1].oscillator.note = 52;
+	SDL_Delay(500);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(100);
+
+	oscillators[1].oscillator.note = 50;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 48;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 47;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 50;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+
+
+	oscillators[1].oscillator.note = 48;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 47;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 45;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+	oscillators[1].oscillator.note = 48;
+	SDL_Delay(250);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(50);
+
+	oscillators[1].oscillator.note = 47;
+	SDL_Delay(500);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(100);
+	oscillators[1].oscillator.note = 44;
+	SDL_Delay(500);
+	oscillators[1].oscillator.note = 0;
+	SDL_Delay(100);
 	// cleanup
 
 	SDL_CloseAudioDevice(dev);

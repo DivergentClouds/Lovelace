@@ -1,0 +1,1390 @@
+#include "cpu.h"
+
+void do_reset();
+void do_interrupt();
+
+void do_cycle() {
+	if (stage == 0) {
+		if (pins.reset) {
+			do_reset();
+
+			return;
+		} else if (pins.interrupt && !(registers.flags & 0b00100000)) {
+			interrupting = 1;
+		} else {
+			instruction = pins.data;
+		}
+	}
+
+	if (interrupting) {
+		do_interrupt();
+
+		if (interrupting) return;
+	} else switch (instruction) {
+		case STORE_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					temp[0] = pins.data; // literal
+					pins.rw = 1;
+					pins.address = registers.pc + 2;
+					stage++;
+					break;
+				case 2:
+					temp[1] = pins.data; // top of address
+					pins.rw = 1;
+					pins.address = registers.pc + 3;
+					stage++;
+					break;
+				case 3:
+					pins.address = (temp[1] << 8) | pins.data;
+					pins.data = temp[0];
+					pins.rw = 0;
+					stage++;
+					break;
+				case 4:
+					registers.pc += 4;
+					stage = 0;
+					break;
+			}
+			break;
+		case STORE_ZP_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					temp[0] = pins.data; // literal
+					pins.rw = 1;
+					pins.address = registers.pc + 2;
+					stage++;
+					break;
+				case 2:
+					pins.address = pins.data;
+					pins.data = temp[0];
+					pins.rw = 0;
+					stage++;
+					break;
+				case 3:
+					registers.pc += 3;
+					stage = 0;
+					break;
+			}
+			break;
+		case STORE_R0:
+			do_store(registers.r[0]);
+			break;
+		case STORE_R1:
+			do_store(registers.r[1]);
+			break;
+		case STORE_R2:
+			do_store(registers.r[2]);
+			break;
+		case STORE_R3:
+			do_store(registers.r[3]);
+			break;
+		case STORE_ACC:
+			do_store(registers.acc);
+			break;
+		case STORE_ZP_R0:
+			do_store_zp(registers.r[0]);
+			break;
+		case STORE_ZP_R1:
+			do_store_zp(registers.r[1]);
+			break;
+		case STORE_ZP_R2:
+			do_store_zp(registers.r[2]);
+			break;
+		case STORE_ZP_R3:
+			do_store_zp(registers.r[3]);
+			break;
+		case STORE_ZP_ACC:
+			do_store_zp(registers.acc);
+			break;
+		case LOAD_R0:
+			do_load(&registers.r[0]);
+			break;
+		case LOAD_R1:
+			do_load(&registers.r[1]);
+			break;
+		case LOAD_R2:
+			do_load(&registers.r[2]);
+			break;
+		case LOAD_R3:
+			do_load(&registers.r[3]);
+			break;
+		case LOAD_ACC:
+			do_load(&registers.acc);
+			break;
+		case LOAD_ZP_R0:
+			do_load_zp(&registers.r[0]);
+			break;
+		case LOAD_ZP_R1:
+			do_load_zp(&registers.r[1]);
+			break;
+		case LOAD_ZP_R2:
+			do_load_zp(&registers.r[2]);
+			break;
+		case LOAD_ZP_R3:
+			do_load_zp(&registers.r[3]);
+			break;
+		case LOAD_ZP_ACC:
+			do_load_zp(&registers.acc);
+			break;
+		case LOAD_LIT_R0:
+			do_load_lit(&registers.r[0]);
+			break;
+		case LOAD_LIT_R1:
+			do_load_lit(&registers.r[1]);
+			break;
+		case LOAD_LIT_R2:
+			do_load_lit(&registers.r[2]);
+			break;
+		case LOAD_LIT_R3:
+			do_load_lit(&registers.r[3]);
+			break;
+		case LOAD_LIT_ACC:
+			do_load_lit(&registers.acc);
+			break;
+		case TRANS_R0_R1:
+			registers.r[1] = registers.r[0];
+			registers.pc++;
+			break;
+		case TRANS_R0_R2:
+			registers.r[2] = registers.r[0];
+			registers.pc++;
+			break;
+		case TRANS_R0_R3:
+			registers.r[3] = registers.r[0];
+			registers.pc++;
+			break;
+		case TRANS_R0_ACC:
+			registers.acc = registers.r[0];
+			registers.pc++;
+			break;
+		case TRANS_R1_R0:
+			registers.r[0] = registers.r[1];
+			registers.pc++;
+			break;
+		case TRANS_R1_R2:
+			registers.r[2] = registers.r[1];
+			registers.pc++;
+			break;
+		case TRANS_R1_R3:
+			registers.r[3] = registers.r[1];
+			registers.pc++;
+			break;
+		case TRANS_R1_ACC:
+			registers.acc = registers.r[1];
+			registers.pc++;
+			break;
+		case TRANS_R2_R0:
+			registers.r[0] = registers.r[2];
+			registers.pc++;
+			break;
+		case TRANS_R2_R1:
+			registers.r[1] = registers.r[2];
+			registers.pc++;
+			break;
+		case TRANS_R2_R3:
+			registers.r[3] = registers.r[2];
+			registers.pc++;
+			break;
+		case TRANS_R2_ACC:
+			registers.acc = registers.r[2];
+			registers.pc++;
+			break;
+		case TRANS_R3_R0:
+			registers.r[0] = registers.r[3];
+			registers.pc++;
+			break;
+		case TRANS_R3_R1:
+			registers.r[1] = registers.r[3];
+			registers.pc++;
+			break;
+		case TRANS_R3_R2:
+			registers.r[2] = registers.r[3];
+			registers.pc++;
+			break;
+		case TRANS_R3_ACC:
+			registers.acc = registers.r[3];
+			registers.pc++;
+			break;
+		case TRANS_ACC_R0:
+			registers.acc = registers.r[0];
+			registers.pc++;
+			break;
+		case TRANS_ACC_R1:
+			registers.acc = registers.r[1];
+			registers.pc++;
+			break;
+		case TRANS_ACC_R2:
+			registers.acc = registers.r[2];
+			registers.pc++;
+			break;
+		case TRANS_ACC_R3:
+			registers.acc = registers.r[3];
+			registers.pc++;
+			break;
+		case TRANS_SP_R0:
+			registers.r[0] = registers.sp;
+			registers.pc++;
+			break;
+		case TRANS_SP_R1:
+			registers.r[1] = registers.sp;
+			registers.pc++;
+			break;
+		case TRANS_SP_R2:
+			registers.r[2] = registers.sp;
+			registers.pc++;
+			break;
+		case TRANS_SP_R3:
+			registers.r[3] = registers.sp;
+			registers.pc++;
+			break;
+		case TRANS_SP_ACC:
+			registers.acc = registers.sp;
+			registers.pc++;
+			break;
+		case TRANS_FLAGS_R0:
+			registers.r[0] = registers.flags;
+			registers.pc++;
+			break;
+		case TRANS_FLAGS_R1:
+			registers.r[1] = registers.flags;
+			registers.pc++;
+			break;
+		case TRANS_FLAGS_R2:
+			registers.r[2] = registers.flags;
+			registers.pc++;
+			break;
+		case TRANS_FLAGS_R3:
+			registers.r[3] = registers.flags;
+			registers.pc++;
+			break;
+		case TRANS_FLAGS_ACC:
+			registers.acc = registers.flags;
+			registers.pc++;
+			break;
+		case ADD_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					do_add(pins.data);
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case ADDC_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					do_addc(pins.data);
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case ADD_R0:
+			do_add(registers.r[0]);
+			registers.pc++;
+			break;
+		case ADD_R1:
+			do_add(registers.r[1]);
+			registers.pc++;
+			break;
+		case ADD_R2:
+			do_add(registers.r[2]);
+			registers.pc++;
+			break;
+		case ADD_R3:
+			do_add(registers.r[3]);
+			registers.pc++;
+			break;
+		case ADDC_R0:
+			do_addc(registers.r[0]);
+			registers.pc++;
+			break;
+		case ADDC_R1:
+			do_addc(registers.r[1]);
+			registers.pc++;
+			break;
+		case ADDC_R2:
+			do_addc(registers.r[2]);
+			registers.pc++;
+			break;
+		case ADDC_R3:
+			do_addc(registers.r[3]);
+			registers.pc++;
+			break;
+		case SUB_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					do_sub(pins.data);
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case SUBC_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					do_subc(pins.data);
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case SUB_R0:
+			do_sub(registers.r[0]);
+			registers.pc++;
+			break;
+		case SUB_R1:
+			do_sub(registers.r[1]);
+			registers.pc++;
+			break;
+		case SUB_R2:
+			do_sub(registers.r[2]);
+			registers.pc++;
+			break;
+		case SUB_R3:
+			do_sub(registers.r[3]);
+			registers.pc++;
+			break;
+		case SUBC_R0:
+			do_subc(registers.r[0]);
+			registers.pc++;
+			break;
+		case SUBC_R1:
+			do_subc(registers.r[1]);
+			registers.pc++;
+			break;
+		case SUBC_R2:
+			do_subc(registers.r[2]);
+			registers.pc++;
+			break;
+		case SUBC_R3:
+			do_subc(registers.r[3]);
+			registers.pc++;
+			break;
+		case SHR_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					registers.acc >>= pins.data;
+					set_zero_and_sign();
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case SHR_R0:
+			registers.acc >>= registers.r[0];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHR_R1:
+			registers.acc >>= registers.r[1];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHR_R2:
+			registers.acc >>= registers.r[2];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHR_R3:
+			registers.acc >>= registers.r[3];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHR_ACC:
+			registers.acc >>= registers.acc;
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHL_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					registers.acc <<= pins.data;
+					set_zero_and_sign();
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case SHL_R0:
+			registers.acc <<= registers.r[0];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHL_R1:
+			registers.acc <<= registers.r[1];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHL_R2:
+			registers.acc <<= registers.r[2];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHL_R3:
+			registers.acc <<= registers.r[3];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case SHL_ACC:
+			registers.acc <<= registers.acc;
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case AND_R0:
+			registers.acc &= registers.r[0];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case AND_R1:
+			registers.acc &= registers.r[1];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case AND_R2:
+			registers.acc &= registers.r[2];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case AND_R3:
+			registers.acc &= registers.r[3];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case AND_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					registers.acc &= pins.data;
+					set_zero_and_sign();
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case OR_R0:
+			registers.acc |= registers.r[0];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case OR_R1:
+			registers.acc |= registers.r[1];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case OR_R2:
+			registers.acc |= registers.r[2];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case OR_R3:
+			registers.acc |= registers.r[3];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case OR_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					registers.acc |= pins.data;
+					set_zero_and_sign();
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case XOR_R0:
+			registers.acc ^= registers.r[0];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case XOR_R1:
+			registers.acc ^= registers.r[1];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case XOR_R2:
+			registers.acc ^= registers.r[2];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case XOR_R3:
+			registers.acc ^= registers.r[3];
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case XOR_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					registers.acc ^= pins.data;
+					set_zero_and_sign();
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case NOT_0:
+			registers.acc = ~registers.acc;
+			set_zero_and_sign();
+			registers.pc++;
+			break;
+		case INC_R0:
+			do_inc(0);
+			registers.pc++;
+			break;
+		case INC_R1:
+			do_inc(1);
+			registers.pc++;
+			break;
+		case INC_R2:
+			do_inc(2);
+			registers.pc++;
+			break;
+		case INC_R3:
+			do_inc(3);
+			registers.pc++;
+			break;
+		case INC_ACC:
+			do_add(1);
+			registers.pc++;
+			break;
+		case DEC_R0:
+			do_dec(0);
+			registers.pc++;
+			break;
+		case DEC_R1:
+			do_dec(1);
+			registers.pc++;
+			break;
+		case DEC_R2:
+			do_dec(2);
+			registers.pc++;
+			break;
+		case DEC_R3:
+			do_dec(3);
+			registers.pc++;
+			break;
+		case DEC_ACC:
+			do_sub(1);
+			registers.pc++;
+			break;
+		case JSR_0:
+			switch (stage) {
+				case 0:
+					pins.rw = 0;
+					pins.data = registers.pc >> 8;
+					registers.sp++;
+					pins.address = 0x100 | registers.sp;
+					stage++;
+					break;
+				case 1:
+					pins.rw = 0;
+					pins.data = registers.pc;
+					registers.sp++;
+					pins.address = 0x100 | registers.sp;
+					stage++;
+					break;
+				case 2:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 3:
+					registers.pc = ((uint16_t) pins.data) << 8;
+					pins.rw = 1;
+					pins.address = registers.pc + 2;
+					stage++;
+					break;
+				case 4:
+					registers.pc |= pins.data;
+					stage = 0;
+					break;
+			}
+			break;
+		case RET_0:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = 0x100 | registers.sp;
+					registers.sp--;
+					stage++;
+					break;
+				case 1:
+					registers.pc = pins.data;
+					pins.rw = 1;
+					pins.address = 0x100 | registers.sp;
+					registers.sp--;
+					stage++;
+					break;
+				case 2:
+					registers.pc |= ((uint16_t) pins.data) << 8;
+					stage = 0;
+					registers.pc++; // JSR has to push own address
+					break;
+			}
+			break;
+		case RETI_0:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = 0x100 | registers.sp;
+					registers.sp--;
+					stage++;
+					break;
+				case 1:
+					registers.pc = pins.data;
+					pins.rw = 1;
+					pins.address = 0x100 | registers.sp;
+					registers.sp--;
+					stage++;
+					break;
+				case 2:
+					registers.pc |= ((uint16_t) pins.data) << 8;
+					pins.rw = 1;
+					pins.address = 0x100 | registers.sp;
+					registers.sp--;
+					stage++;
+					break;
+				case 3:
+					registers.flags = pins.data;
+					stage = 0;
+					break; // interrupts push an already incremented address
+			}
+			break;
+		case PUSH_R0:
+			do_push(registers.r[0]);
+			break;
+		case PUSH_R1:
+			do_push(registers.r[1]);
+			break;
+		case PUSH_R2:
+			do_push(registers.r[2]);
+			break;
+		case PUSH_R3:
+			do_push(registers.r[3]);
+			break;
+		case PUSH_ACC:
+			do_push(registers.acc);
+			break;
+		case PUSH_LIT:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					pins.rw = 0;
+					registers.sp++;
+					pins.address = 0x100 | registers.sp;
+					stage++;
+					break;
+				case 2:
+					// Time for writing to stack
+					stage = 0;
+					registers.pc += 2;
+					break;
+			}
+			break;
+		case POP_R0:
+			do_pop(&registers.r[0]);
+			break;
+		case POP_R1:
+			do_pop(&registers.r[1]);
+			break;
+		case POP_R2:
+			do_pop(&registers.r[2]);
+			break;
+		case POP_R3:
+			do_pop(&registers.r[3]);
+			break;
+		case POP_ACC:
+			do_pop(&registers.acc);
+			break;
+		case DROP_0:
+			registers.sp--;
+			registers.pc++;
+			break;
+		case CMP_R0_R1:
+			do_compare(registers.r[0], registers.r[1]);
+			registers.pc++;
+			break;
+		case CMP_R0_R2:
+			do_compare(registers.r[0], registers.r[2]);
+			registers.pc++;
+			break;
+		case CMP_R0_R3:
+			do_compare(registers.r[0], registers.r[3]);
+			registers.pc++;
+			break;
+		case CMP_R0_ACC:
+			do_compare(registers.r[0], registers.acc);
+			registers.pc++;
+			break;
+		case CMP_R1_R0:
+			do_compare(registers.r[1], registers.r[0]);
+			registers.pc++;
+			break;
+		case CMP_R1_R2:
+			do_compare(registers.r[1], registers.r[2]);
+			registers.pc++;
+			break;
+		case CMP_R1_R3:
+			do_compare(registers.r[1], registers.r[3]);
+			registers.pc++;
+			break;
+		case CMP_R1_ACC:
+			do_compare(registers.r[1], registers.acc);
+			registers.pc++;
+			break;
+		case CMP_R2_R0:
+			do_compare(registers.r[2], registers.r[0]);
+			registers.pc++;
+			break;
+		case CMP_R2_R1:
+			do_compare(registers.r[2], registers.r[1]);
+			registers.pc++;
+			break;
+		case CMP_R2_R3:
+			do_compare(registers.r[2], registers.r[3]);
+			registers.pc++;
+			break;
+		case CMP_R2_ACC:
+			do_compare(registers.r[2], registers.acc);
+			registers.pc++;
+			break;
+		case CMP_R3_R0:
+			do_compare(registers.r[3], registers.r[0]);
+			registers.pc++;
+			break;
+		case CMP_R3_R1:
+			do_compare(registers.r[3], registers.r[1]);
+			registers.pc++;
+			break;
+		case CMP_R3_R2:
+			do_compare(registers.r[3], registers.r[2]);
+			registers.pc++;
+			break;
+		case CMP_R3_ACC:
+			do_compare(registers.r[3], registers.acc);
+			registers.pc++;
+			break;
+		case CMP_ACC_R0:
+			do_compare(registers.acc, registers.r[0]);
+			registers.pc++;
+			break;
+		case CMP_ACC_R1:
+			do_compare(registers.acc, registers.r[1]);
+			registers.pc++;
+			break;
+		case CMP_ACC_R2:
+			do_compare(registers.acc, registers.r[2]);
+			registers.pc++;
+			break;
+		case CMP_ACC_R3:
+			do_compare(registers.acc, registers.r[3]);
+			registers.pc++;
+			break;
+		case CMP_R0_LIT:
+			do_compare_lit(registers.r[0]);
+			break;
+		case CMP_R1_LIT:
+			do_compare_lit(registers.r[1]);
+			break;
+		case CMP_R2_LIT:
+			do_compare_lit(registers.r[2]);
+			break;
+		case CMP_R3_LIT:
+			do_compare_lit(registers.r[3]);
+			break;
+		case CMP_ACC_LIT:
+			do_compare_lit(registers.acc);
+			break;
+		case BRA_S:
+			do_bra(0b10000000);
+			break;
+		case BRA_C:
+			do_bra(0b01000000);
+			break;
+		case BRA_I:
+			do_bra(0b00100000);
+			break;
+		case BRA_O:
+			do_bra(0b00010000);
+			break;
+		case BRA_G:
+			do_bra(0b00000010);
+			break;
+		case BRA_Z:
+			do_bra(0b00000001);
+			break;
+		case BRAN_S:
+			do_bran(0b10000000);
+			break;
+		case BRAN_C:
+			do_bran(0b01000000);
+			break;
+		case BRAN_I:
+			do_bran(0b00100000);
+			break;
+		case BRAN_O:
+			do_bran(0b00010000);
+			break;
+		case BRAN_G:
+			do_bran(0b00000010);
+			break;
+		case BRAN_Z:
+			do_bran(0b00000001);
+			break;
+		case JMP_0:
+			switch (stage) {
+				case 0:
+					pins.rw = 1;
+					pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					registers.pc = ((uint16_t) pins.data) << 8;
+					pins.rw = 1;
+					pins.address = registers.pc + 2;
+					stage++;
+					break;
+				case 2:
+					registers.pc |= pins.data;
+					stage = 0;
+					break;
+			}
+			break;
+		case SET_S:
+			registers.flags |= 0b10000000;
+			registers.pc++;
+			break;
+		case SET_C:
+			registers.flags |= 0b01000001;
+			registers.pc++;
+			break;
+		case SET_I:
+			registers.flags |= 0b00100000;
+			registers.pc++;
+			break;
+		case SET_O:
+			registers.flags |= 0b00010000;
+			registers.pc++;
+			break;
+		case SET_G:
+			registers.flags |= 0b00000010;
+			registers.pc++;
+			break;
+		case SET_Z:
+			registers.flags |= 0b00000001;
+			registers.pc++;
+			break;
+		case CLEAR_S:
+			registers.flags &= 0b01111111;
+			registers.pc++;
+			break;
+		case CLEAR_C:
+			registers.pc++;
+			registers.flags &= 0b10111111;
+			break;
+		case CLEAR_I:
+			registers.flags &= 0b11011111;
+			registers.pc++;
+			break;
+		case CLEAR_O:
+			registers.flags &= 0b11101111;
+			registers.pc++;
+			break;
+		case CLEAR_G:
+			registers.flags &= 0b11111101;
+			registers.pc++;
+			break;
+		case CLEAR_Z:
+			registers.flags &= 0b11111110;
+			registers.pc++;
+			break;
+		default:
+			registers.pc++;
+	}
+
+	if (stage == 0) {
+		pins.rw = 1;
+		pins.address = registers.pc;
+	}
+}
+
+void do_compare(uint8_t a, uint8_t b) {
+	if (a == b) {
+		registers.flags |= 0b00000001;
+	} else {
+		registers.flags &= 0b11111110;
+	}
+
+	if (a > b) {
+		registers.flags |= 0b00000010;
+	} else {
+		registers.flags &= 0b11111101;
+	}
+}
+
+void set_zero_and_sign() {
+	if (registers.acc == 0) {
+		registers.flags |= 0b00000001;
+	} else {
+		registers.flags &= 0b11111110;
+	}
+
+	if (registers.acc & 0b10000000) {
+		registers.flags |= 0b10000000;
+	} else {
+		registers.flags &= 0b01111111;
+	}
+}
+
+void set_zero_and_sign_value(uint8_t value) {
+	if (value == 0) {
+		registers.flags |= 0b00000001;
+	} else {
+		registers.flags &= 0b11111110;
+	}
+
+	if (value & 0b10000000) {
+		registers.flags |= 0b10000000;
+	} else {
+		registers.flags &= 0b01111111;
+	}
+}
+
+void do_inc(uint8_t reg) {
+	uint8_t old = registers.r[reg];
+
+	registers.r[reg]++;
+
+	if (registers.r[reg] < old) {
+		registers.flags |= 0b01000000;
+	} else {
+		registers.flags &= 0b10111111;
+	}
+
+	if (((int8_t)registers.r[reg]) < ((int8_t)old)) {
+		registers.flags |= 0b00010000;
+	} else {
+		registers.flags &= 0b11101111;
+	}
+
+	set_zero_and_sign_value(registers.r[reg]);
+}
+
+void do_dec(uint8_t reg) {
+	uint8_t old = registers.r[reg];
+
+	registers.r[reg]--;
+
+	if (registers.r[reg] > old) {
+		registers.flags |= 0b01000000;
+	} else {
+		registers.flags &= 0b10111111;
+	}
+
+	if (((int8_t)registers.r[reg]) > ((int8_t)old)) {
+		registers.flags |= 0b00010000;
+	} else {
+		registers.flags &= 0b11101111;
+	}
+
+	set_zero_and_sign_value(registers.r[reg]);
+}
+
+void do_add(uint8_t value) {
+	uint8_t old = registers.acc;
+
+	registers.acc += value;
+
+	if (registers.acc < old) {
+		registers.flags |= 0b01000000;
+	} else {
+		registers.flags &= 0b10111111;
+	}
+
+	if (((int8_t)registers.acc) < ((int8_t)old)) {
+		registers.flags |= 0b00010000;
+	} else {
+		registers.flags &= 0b11101111;
+	}
+
+	set_zero_and_sign();
+}
+
+void do_addc(uint8_t value) {
+	uint8_t old = registers.acc;
+
+	registers.acc += value;
+
+	if (registers.flags & 0b01000000) {
+		registers.acc++;
+	}
+
+	if (registers.acc < old) {
+		registers.flags |= 0b01000000;
+	} else {
+		registers.flags &= 0b10111111;
+	}
+
+	if (((int8_t)registers.acc) < ((int8_t)old)) {
+		registers.flags |= 0b00010000;
+	} else {
+		registers.flags &= 0b11101111;
+	}
+
+	set_zero_and_sign();
+}
+
+void do_sub(uint8_t value) {
+	uint8_t old = registers.acc;
+
+	registers.acc -= value;
+
+	if (registers.acc > old) {
+		registers.flags |= 0b01000000;
+	} else {
+		registers.flags &= 0b10111111;
+	}
+
+	if (((int8_t)registers.acc) > ((int8_t)old)) {
+		registers.flags |= 0b00010000;
+	} else {
+		registers.flags &= 0b11101111;
+	}
+
+	set_zero_and_sign();
+}
+
+void do_subc(uint8_t value) {
+	uint8_t old = registers.acc;
+
+	registers.acc -= value;
+
+	if (registers.flags & 0b01000000) {
+		registers.acc--;
+	}
+
+	if (registers.acc > old) {
+		registers.flags |= 0b01000000;
+	} else {
+		registers.flags &= 0b10111111;
+	}
+
+	if (((int8_t)registers.acc) > ((int8_t)old)) {
+		registers.flags |= 0b00010000;
+	} else {
+		registers.flags &= 0b11101111;
+	}
+
+	set_zero_and_sign();
+}
+
+void do_load(uint8_t *data) {
+	switch (stage) {
+		case 0:
+			pins.rw = 1;
+			pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			temp[0] = pins.data;
+			pins.rw = 1;
+			pins.address = registers.pc + 2;
+			stage++;
+			break;
+		case 2:
+			pins.rw = 1;
+			pins.address = ((uint16_t) temp[0] << 8) | pins.data;
+			stage++;
+			break;
+		case 3:
+			*data = pins.data;
+			stage = 0;
+			registers.pc += 3;
+			break;
+	}
+}
+
+void do_load_zp(uint8_t *data) {
+	switch (stage) {
+		case 0:
+			pins.rw = 1;
+			pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			pins.rw = 1;
+			pins.address = pins.data;
+			stage++;
+			break;
+		case 2:
+			*data = pins.data;
+			stage = 0;
+			registers.pc += 2;
+			break;
+	}
+}
+
+void do_load_lit(uint8_t *data) {
+
+		switch (stage) {
+			case 0:
+				pins.rw = 1;
+				pins.address = registers.pc + 1;
+				stage++;
+				break;
+			case 1:
+				*data = pins.data;
+				stage = 0;
+				registers.pc += 2;
+				break;
+		}
+}
+
+void do_store(uint8_t data) {
+	switch (stage) {
+		case 0:
+			pins.rw = 1;
+			pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			temp[0] = pins.data;
+			pins.rw = 1;
+			pins.address = registers.pc + 2;
+			stage++;
+			break;
+		case 2:
+			pins.rw = 0;
+			pins.address = ((uint16_t) temp[0] << 8) | pins.data;
+			pins.data = data;
+			stage++;
+			break;
+		case 3:
+			stage = 0;
+			registers.pc += 2;
+			break;
+	}
+}
+
+void do_store_zp(uint8_t data) {
+	switch (stage) {
+		case 0:
+			pins.rw = 1;
+			pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			pins.rw = 0;
+			pins.address = pins.data;
+			pins.data = data;
+			stage++;
+			break;
+		case 2:
+			stage = 0;
+			registers.pc += 2;
+			break;
+	}
+}
+
+void do_push(uint8_t data) {
+	switch (stage) {
+		case 0:
+			pins.rw = 0;
+			registers.sp++;
+			pins.address = 0x100 | registers.sp;
+			pins.data = data;
+			stage++;
+			break;
+		case 1:
+			// Time for writing to stack
+			stage = 0;
+			registers.pc++;
+			break;
+	}
+}
+
+void do_pop(uint8_t *data) {
+	switch (stage) {
+		case 0:
+			pins.rw = 1;
+			pins.address = 0x100 | registers.sp;
+			registers.sp--;
+			stage++;
+			break;
+		case 1:
+			*data = pins.data;
+			stage = 0;
+			registers.pc++;
+			break;
+	}
+}
+
+void do_bra(uint8_t mask) {
+	switch (stage) {
+		case 0:
+			if (registers.flags & mask) {
+				pins.rw = 1;
+				pins.address = registers.pc + 1;
+				stage++;
+			} else {
+				registers.pc += 3;
+			}
+			break;
+		case 1:
+			registers.pc = ((uint16_t) pins.data) << 8;
+			pins.rw = 1;
+			pins.address = registers.pc + 2;
+			stage++;
+			break;
+		case 2:
+			registers.pc |= pins.data;
+			stage = 0;
+			break;
+	}
+}
+
+void do_bran(uint8_t mask) {
+	switch (stage) {
+		case 0:
+			if (!(registers.flags & mask)) {
+				pins.rw = 1;
+				pins.address = registers.pc + 1;
+				stage++;
+			} else {
+				registers.pc += 3;
+			}
+			break;
+		case 1:
+			registers.pc = ((uint16_t) pins.data) << 8;
+			pins.rw = 1;
+			pins.address = registers.pc + 2;
+			stage++;
+			break;
+		case 2:
+			registers.pc |= pins.data;
+			stage = 0;
+			break;
+	}
+}
+
+void do_compare_lit(uint8_t data) {
+	switch (stage) {
+		case 0:
+			pins.rw = 1;
+			pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			do_compare(data, pins.data);
+			stage = 0;
+			registers.pc += 2;
+			break;
+	}
+}
+
+void do_reset() {
+	registers.r[0] = 0;
+	registers.r[1] = 0;
+	registers.r[2] = 0;
+	registers.r[3] = 0;
+	registers.acc = 0;
+	registers.flags = 0;
+	registers.sp = 0;
+	registers.pc = 0x0200;
+
+	pins.address = 0;
+	pins.data = 0;
+	pins.interrupt = 0;
+	pins.rw = 1;
+	pins.reset = 0;
+}
+
+void do_interrupt() {
+	switch (stage) {
+		case 0:
+			pins.rw = 0;
+			registers.sp++;
+			pins.address = 0x100 | registers.sp;
+			pins.data = registers.flags;
+			stage++;
+			break;
+		case 1:
+			pins.rw = 0;
+			registers.sp++;
+			pins.address = 0x100 | registers.sp;
+			pins.data = registers.pc >> 8;
+			stage++;
+			break;
+		case 2:
+			pins.rw = 0;
+			registers.sp++;
+			pins.address = 0x100 | registers.sp;
+			pins.data = registers.pc;
+			stage++;
+			break;
+		case 3:
+			stage = 0;
+			registers.pc = 0x3F00;
+			interrupting = 0;
+			break;
+	}
+}

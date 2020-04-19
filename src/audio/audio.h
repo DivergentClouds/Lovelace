@@ -7,16 +7,13 @@
 #include <stdlib.h>
 
 #define SAMPLE_RATE 44100
+#define AUDIO_BUFFER_SIZE 4096
 
 // registers
 
 typedef struct {
 	uint8_t high;
 	uint8_t low;
-	// uint8_t attack;
-	// uint8_t decay;
-	// uint8_t sustain;
-	// uint8_t release;
 	uint8_t waveform;
 	uint8_t width;
 	uint8_t note;
@@ -97,6 +94,10 @@ biquad_t highpass_state[6];
 
 float lowpass(float sample, uint8_t n, uint8_t osc, float butterworth_const);
 float highpass(float sample, uint8_t n, uint8_t osc, float butterworth_const);
+
+float smooth_volume[3];
+float smooth_low[3];
+float smooth_high[3];
 
 void audio_callback(void *data, Uint8 *stream, int len);
 

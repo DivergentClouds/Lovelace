@@ -3,8 +3,7 @@
 # Harriet
 
 ## Registers
-- `r1`, `r2`, `r3`, `r4` 8-bit general registers
- - perhaps `a`, `b`, `c`, `d` instead?
+- `r0`, `r1`, `r2`, `r3` 8-bit general registers
 - `pc`, 16-bit program counter
 - `acc` 8-bit accumulator
 - `sp` 8-bit stack pointer
@@ -53,9 +52,9 @@ Data movement operations are in the form `{source}, {destination}`.
 - `addc {general register}` (1 byte, 1 cycle, 4 opcodes)
 - `sub {general register}` (1 byte, 1 cycle, 4 opcodes)
 - `subc {general register}` (1 byte, 1 cycle, 4 opcodes)
-- `shr` (1 byte, 1 cycle, 1 opcode)
+- `shr {literal}` (2 bytes, 2 cycles, 1 opcode)
 - `shr {value register}` (1 byte, 1 cycle, 5 opcodes)
-- `shl` (1 byte, 1 cycle, 1 opcode)
+- `shl {literal}` (2 bytes, 2 cycles, 1 opcode)
 - `shl {value register}` (1 byte, 1 cycle, 5 opcodes)
 - `and {general register}` (1 byte, 1 cycle, 4 opcodes)
 - `and {literal}` (2 bytes, 2 cycles, 1 opcode)
@@ -71,15 +70,15 @@ Data movement operations are in the form `{source}, {destination}`.
 
 ### Subroutine instructions (3 opcodes)
 
-- `jsr {address}` (3 bytes, 6 cycles, pushes 2)
-- `ret` (1 byte, 4 cycles, pops 2)
-- `reti` (1 byte, 5 cycles, pops 3)
+- `jsr {address}` (3 bytes, 5 cycles, pushes 2)
+- `ret` (1 byte, 3 cycles, pops 2)
+- `reti` (1 byte, 4 cycles, pops 3)
 
 ### Stack instructions (12 opcodes)
 
-- `push {value register}` (1 byte, 1 cycle, 5 opcodes)
-- `push {literal}` (2 bytes, 2 cycles, 1 opcode)
-- `pop {value register}` (1 byte, 1 cycle, 5 opcodes)
+- `push {value register}` (1 byte, 2 cycles, 5 opcodes)
+- `push {literal}` (2 bytes, 3 cycles, 1 opcode)
+- `pop {value register}` (1 byte, 2 cycles, 5 opcodes)
 - `drop` (1 byte, 1 cycle, 1 opcode)
 
 ### Jump instructions (38 opcodes)
@@ -94,3 +93,11 @@ Data movement operations are in the form `{source}, {destination}`.
 
 - `set {flag}` (1 byte, 1 cycle, 6 opcodes)
 - `clear {flag}` (1 byte, 1 cycle, 6 opcodes)
+
+## Pins
+
+- Clock pin
+- Reset pin
+- 16 bit address bus
+- 8 bit data bus
+- read/write pin
