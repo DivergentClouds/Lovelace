@@ -1,4 +1,5 @@
 #include "audio.h"
+#include "../clock/clock.h"
 
 // registers
 
@@ -12,23 +13,21 @@ void reset_registers() {
 
 // pins
 
-void reset_pins() {
-	for (int pin = 0; pin < 10; pin++) {
-		pins.bytes[pin] = 0;
-	}
-}
+// void reset_pins() {
+// 	for (int pin = 0; pin < 10; pin++) {
+// 		audio_pins.bytes[pin] = 0;
+// 	}
+// }
 
 // clock stuff
 
-void clock_actions() {
-	if (pins.pins.clock) {
-		if (pins.pins.rw) { // read
-			pins.pins.data = oscillators[pins.pins.osc]
-				.registers[pins.pins.reg];
-		} else { // write
-			oscillators[pins.pins.osc]
-				.registers[pins.pins.reg] = pins.pins.data;
-		}
+void do_audio_cycle() {
+	if (audio_pins.rw) { // read
+			audio_pins.data = oscillators[audio_pins.osc]
+			.registers[audio_pins.reg];
+	} else { // write
+		oscillators[audio_pins.osc]
+			.registers[audio_pins.reg] = audio_pins.data;
 	}
 }
 
@@ -97,18 +96,18 @@ void generate_sample() {
 		smooth_high[i] = (smooth_high[i] * 199 +
 				oscillators[i].oscillator.high / 255.0) / 200;
 
-	pins.pins.out = 0;
-	pins.pins.out += highpass(highpass(lowpass(lowpass(render_oscillator(0),
+	audio_pins.out = 0;
+	audio_pins.out += highpass(highpass(lowpass(lowpass(render_oscillator(0),
 		0, 0, butterworth_const_1),
 		3, 0, butterworth_const_2),
 		0, 0, butterworth_const_1),
 		3, 0, butterworth_const_2);
-	pins.pins.out += highpass(highpass(lowpass(lowpass(render_oscillator(1),
+	audio_pins.out += highpass(highpass(lowpass(lowpass(render_oscillator(1),
 		1, 1, butterworth_const_1),
 		4, 1, butterworth_const_2),
 		1, 1, butterworth_const_1),
 		4, 1, butterworth_const_2);
-	pins.pins.out += highpass(highpass(lowpass(lowpass(render_oscillator(2),
+	audio_pins.out += highpass(highpass(lowpass(lowpass(render_oscillator(2),
 		2, 2, butterworth_const_1),
 		5, 2, butterworth_const_2),
 		2, 2, butterworth_const_1),
@@ -177,172 +176,4 @@ float highpass(float sample, uint8_t n, uint8_t osc, float butterworth_const) {
 	highpass_state[n].y1 = result;
 
 	return result;
-}
-
-void audio_callback(void *data, Uint8 *stream, int len) {
-	float *fstream;
-
-	fstream = (float *) stream;
-	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++) {
-		generate_sample();
-		fstream[i] = pins.pins.out;
-	}
-}
-
-SDL_AudioDeviceID initialise_audio() {
-	SDL_AudioSpec want, have;
-	SDL_AudioDeviceID dev;
-
-	SDL_memset(&want, 0, sizeof(want));
-	want.freq = SAMPLE_RATE;
-	want.format = AUDIO_F32;
-	want.channels = 1;
-	want.samples = AUDIO_BUFFER_SIZE;
-	want.callback = audio_callback;
-	dev = SDL_OpenAudioDevice(NULL, 0, &want, &have,
-		SDL_AUDIO_ALLOW_FORMAT_CHANGE);
-
-	return dev;
-}
-
-const uint8_t scale[7] = {0, 2, 4, 5, 7, 9, 11};
-
-int main(int argc, char const **argv) {
-	SDL_AudioDeviceID dev;
-
-	reset_registers();
-	reset_pins();
-	srand(0x7EA75);
-
-	// play audio
-
-	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
-		return 1;
-	}
-
-	dev = initialise_audio();
-
-	SDL_PauseAudioDevice(dev, 0);
-
-	// generate audio
-
-	// for (int i = 0; i < 1; i++) {
-	// 	oscillators[i].oscillator.volume = 100;
-	// 	oscillators[i].oscillator.width = 128;
-	// 	oscillators[i].oscillator.waveform = 0b10;
-	// 	oscillators[i].oscillator.note = 30;
-	// 	oscillators[i].oscillator.low = 254;
-	// }
-
-	oscillators[0].oscillator.waveform = 0b00;
-	oscillators[0].oscillator.volume = 25;
-	oscillators[0].oscillator.high = 0;
-	oscillators[0].oscillator.low = 90;
-	oscillators[0].oscillator.width = 128;
-
-	oscillators[1].oscillator.waveform = 0b00;
-	oscillators[1].oscillator.volume = 25;
-	oscillators[1].oscillator.high = 0;
-	oscillators[1].oscillator.low = 128;
-	oscillators[1].oscillator.width = 128;
-
-	oscillators[1].oscillator.note = 38;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-
-	oscillators[1].oscillator.note = 45;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 47;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 48;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 45;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-
-	oscillators[1].oscillator.note = 47;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 48;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 50;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 47;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-
-	oscillators[1].oscillator.note = 48;
-	SDL_Delay(500);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(100);
-	oscillators[1].oscillator.note = 52;
-	SDL_Delay(500);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(100);
-
-	oscillators[1].oscillator.note = 50;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 48;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 47;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 50;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-
-
-	oscillators[1].oscillator.note = 48;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 47;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 45;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-	oscillators[1].oscillator.note = 48;
-	SDL_Delay(250);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(50);
-
-	oscillators[1].oscillator.note = 47;
-	SDL_Delay(500);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(100);
-	oscillators[1].oscillator.note = 44;
-	SDL_Delay(500);
-	oscillators[1].oscillator.note = 0;
-	SDL_Delay(100);
-	// cleanup
-
-	SDL_CloseAudioDevice(dev);
-
-	SDL_Quit();
-
-	return 0;
 }

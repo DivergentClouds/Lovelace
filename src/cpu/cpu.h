@@ -12,16 +12,16 @@ typedef struct registers_s {
 	uint8_t flags; // bitwise
 } registers_t;
 
-typedef struct pins_s {
+typedef struct {
 	uint8_t reset;
 	uint8_t interrupt;
 	uint8_t rw;
 	uint16_t address; // bitwise
 	uint8_t data; // bitwise
-} pins_t;
+} cpu_pins_t;
 
 registers_t registers;
-pins_t pins;
+cpu_pins_t cpu_pins;
 
 // states
 
@@ -31,6 +31,8 @@ uint8_t temp[2]; // for load and store
 uint8_t interrupting;
 
 // misc functions
+
+void do_cpu_cycle(); 
 
 void do_compare(uint8_t a, uint8_t b);
 void do_add(uint8_t value);

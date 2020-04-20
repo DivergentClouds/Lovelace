@@ -88,3 +88,109 @@
 		SDL_Delay(8);
 	}
 ```
+
+## Ultima 3 Wander
+```C
+oscillators[0].oscillator.waveform = 0b00;
+oscillators[0].oscillator.volume = 25;
+oscillators[0].oscillator.high = 0;
+oscillators[0].oscillator.low = 90;
+oscillators[0].oscillator.width = 128;
+
+oscillators[1].oscillator.waveform = 0b00;
+oscillators[1].oscillator.volume = 25;
+oscillators[1].oscillator.high = 0;
+oscillators[1].oscillator.low = 128;
+oscillators[1].oscillator.width = 128;
+
+oscillators[1].oscillator.note = 38;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+
+oscillators[1].oscillator.note = 45;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 47;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 48;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 45;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+
+oscillators[1].oscillator.note = 47;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 48;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 50;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 47;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+
+oscillators[1].oscillator.note = 48;
+SDL_Delay(500);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(100);
+oscillators[1].oscillator.note = 52;
+SDL_Delay(500);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(100);
+
+oscillators[1].oscillator.note = 50;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 48;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 47;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 50;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+
+
+oscillators[1].oscillator.note = 48;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 47;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 45;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+oscillators[1].oscillator.note = 48;
+SDL_Delay(250);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(50);
+
+oscillators[1].oscillator.note = 47;
+SDL_Delay(500);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(100);
+oscillators[1].oscillator.note = 44;
+SDL_Delay(500);
+oscillators[1].oscillator.note = 0;
+SDL_Delay(100);```

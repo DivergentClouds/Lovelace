@@ -6,11 +6,11 @@ A text-based fantasy computer providing:
 
 - Virtual graphics, input, audio, memory, storage, and CPU hardware
  - Storage is virtual floppy disks
+- Bootloader ROM
 - A file system
 - An assembly language for that CPU
 - A programming language for that hardware and assembly language
- - Embedded assembly
- - Curses-like graphics library
+ - Embedded assembly (?)
 - A bootstrap compiler for that language, written in Python
 - A basic disk operating system
 - Implementations of these tools

@@ -3,16 +3,16 @@
 void do_reset();
 void do_interrupt();
 
-void do_cycle() {
+void do_cpu_cycle() {
 	if (stage == 0) {
-		if (pins.reset) {
+		if (cpu_pins.reset) {
 			do_reset();
 
 			return;
-		} else if (pins.interrupt && !(registers.flags & 0b00100000)) {
+		} else if (cpu_pins.interrupt && !(registers.flags & 0b00100000)) {
 			interrupting = 1;
 		} else {
-			instruction = pins.data;
+			instruction = cpu_pins.data;
 		}
 	}
 
@@ -24,26 +24,26 @@ void do_cycle() {
 		case STORE_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					temp[0] = pins.data; // literal
-					pins.rw = 1;
-					pins.address = registers.pc + 2;
+					temp[0] = cpu_pins.data; // literal
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 2;
 					stage++;
 					break;
 				case 2:
-					temp[1] = pins.data; // top of address
-					pins.rw = 1;
-					pins.address = registers.pc + 3;
+					temp[1] = cpu_pins.data; // top of address
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 3;
 					stage++;
 					break;
 				case 3:
-					pins.address = (temp[1] << 8) | pins.data;
-					pins.data = temp[0];
-					pins.rw = 0;
+					cpu_pins.address = (temp[1] << 8) | cpu_pins.data;
+					cpu_pins.data = temp[0];
+					cpu_pins.rw = 0;
 					stage++;
 					break;
 				case 4:
@@ -55,20 +55,20 @@ void do_cycle() {
 		case STORE_ZP_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					temp[0] = pins.data; // literal
-					pins.rw = 1;
-					pins.address = registers.pc + 2;
+					temp[0] = cpu_pins.data; // literal
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 2;
 					stage++;
 					break;
 				case 2:
-					pins.address = pins.data;
-					pins.data = temp[0];
-					pins.rw = 0;
+					cpu_pins.address = cpu_pins.data;
+					cpu_pins.data = temp[0];
+					cpu_pins.rw = 0;
 					stage++;
 					break;
 				case 3:
@@ -275,12 +275,12 @@ void do_cycle() {
 		case ADD_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					do_add(pins.data);
+					do_add(cpu_pins.data);
 					stage = 0;
 					registers.pc += 2;
 					break;
@@ -289,12 +289,12 @@ void do_cycle() {
 		case ADDC_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					do_addc(pins.data);
+					do_addc(cpu_pins.data);
 					stage = 0;
 					registers.pc += 2;
 					break;
@@ -335,12 +335,12 @@ void do_cycle() {
 		case SUB_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					do_sub(pins.data);
+					do_sub(cpu_pins.data);
 					stage = 0;
 					registers.pc += 2;
 					break;
@@ -349,12 +349,12 @@ void do_cycle() {
 		case SUBC_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					do_subc(pins.data);
+					do_subc(cpu_pins.data);
 					stage = 0;
 					registers.pc += 2;
 					break;
@@ -395,12 +395,12 @@ void do_cycle() {
 		case SHR_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					registers.acc >>= pins.data;
+					registers.acc >>= cpu_pins.data;
 					set_zero_and_sign();
 					stage = 0;
 					registers.pc += 2;
@@ -435,12 +435,12 @@ void do_cycle() {
 		case SHL_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					registers.acc <<= pins.data;
+					registers.acc <<= cpu_pins.data;
 					set_zero_and_sign();
 					stage = 0;
 					registers.pc += 2;
@@ -495,12 +495,12 @@ void do_cycle() {
 		case AND_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					registers.acc &= pins.data;
+					registers.acc &= cpu_pins.data;
 					set_zero_and_sign();
 					stage = 0;
 					registers.pc += 2;
@@ -530,12 +530,12 @@ void do_cycle() {
 		case OR_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					registers.acc |= pins.data;
+					registers.acc |= cpu_pins.data;
 					set_zero_and_sign();
 					stage = 0;
 					registers.pc += 2;
@@ -565,12 +565,12 @@ void do_cycle() {
 		case XOR_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					registers.acc ^= pins.data;
+					registers.acc ^= cpu_pins.data;
 					set_zero_and_sign();
 					stage = 0;
 					registers.pc += 2;
@@ -625,32 +625,32 @@ void do_cycle() {
 		case JSR_0:
 			switch (stage) {
 				case 0:
-					pins.rw = 0;
-					pins.data = registers.pc >> 8;
+					cpu_pins.rw = 0;
+					cpu_pins.data = registers.pc >> 8;
 					registers.sp++;
-					pins.address = 0x100 | registers.sp;
+					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
 					break;
 				case 1:
-					pins.rw = 0;
-					pins.data = registers.pc;
+					cpu_pins.rw = 0;
+					cpu_pins.data = registers.pc;
 					registers.sp++;
-					pins.address = 0x100 | registers.sp;
+					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
 					break;
 				case 2:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 3:
-					registers.pc = ((uint16_t) pins.data) << 8;
-					pins.rw = 1;
-					pins.address = registers.pc + 2;
+					registers.pc = ((uint16_t) cpu_pins.data) << 8;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 2;
 					stage++;
 					break;
 				case 4:
-					registers.pc |= pins.data;
+					registers.pc |= cpu_pins.data;
 					stage = 0;
 					break;
 			}
@@ -658,20 +658,20 @@ void do_cycle() {
 		case RET_0:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = 0x100 | registers.sp;
+					cpu_pins.rw = 1;
+					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
 					break;
 				case 1:
-					registers.pc = pins.data;
-					pins.rw = 1;
-					pins.address = 0x100 | registers.sp;
+					registers.pc = cpu_pins.data;
+					cpu_pins.rw = 1;
+					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
 					break;
 				case 2:
-					registers.pc |= ((uint16_t) pins.data) << 8;
+					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
 					stage = 0;
 					registers.pc++; // JSR has to push own address
 					break;
@@ -680,27 +680,27 @@ void do_cycle() {
 		case RETI_0:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = 0x100 | registers.sp;
+					cpu_pins.rw = 1;
+					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
 					break;
 				case 1:
-					registers.pc = pins.data;
-					pins.rw = 1;
-					pins.address = 0x100 | registers.sp;
+					registers.pc = cpu_pins.data;
+					cpu_pins.rw = 1;
+					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
 					break;
 				case 2:
-					registers.pc |= ((uint16_t) pins.data) << 8;
-					pins.rw = 1;
-					pins.address = 0x100 | registers.sp;
+					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
+					cpu_pins.rw = 1;
+					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
 					break;
 				case 3:
-					registers.flags = pins.data;
+					registers.flags = cpu_pins.data;
 					stage = 0;
 					break; // interrupts push an already incremented address
 			}
@@ -723,14 +723,14 @@ void do_cycle() {
 		case PUSH_LIT:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					pins.rw = 0;
+					cpu_pins.rw = 0;
 					registers.sp++;
-					pins.address = 0x100 | registers.sp;
+					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
 					break;
 				case 2:
@@ -893,18 +893,18 @@ void do_cycle() {
 		case JMP_0:
 			switch (stage) {
 				case 0:
-					pins.rw = 1;
-					pins.address = registers.pc + 1;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
 					stage++;
 					break;
 				case 1:
-					registers.pc = ((uint16_t) pins.data) << 8;
-					pins.rw = 1;
-					pins.address = registers.pc + 2;
+					registers.pc = ((uint16_t) cpu_pins.data) << 8;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 2;
 					stage++;
 					break;
 				case 2:
-					registers.pc |= pins.data;
+					registers.pc |= cpu_pins.data;
 					stage = 0;
 					break;
 			}
@@ -962,8 +962,8 @@ void do_cycle() {
 	}
 
 	if (stage == 0) {
-		pins.rw = 1;
-		pins.address = registers.pc;
+		cpu_pins.rw = 1;
+		cpu_pins.address = registers.pc;
 	}
 }
 
@@ -1140,23 +1140,23 @@ void do_subc(uint8_t value) {
 void do_load(uint8_t *data) {
 	switch (stage) {
 		case 0:
-			pins.rw = 1;
-			pins.address = registers.pc + 1;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
 			stage++;
 			break;
 		case 1:
-			temp[0] = pins.data;
-			pins.rw = 1;
-			pins.address = registers.pc + 2;
+			temp[0] = cpu_pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 2;
 			stage++;
 			break;
 		case 2:
-			pins.rw = 1;
-			pins.address = ((uint16_t) temp[0] << 8) | pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
 			stage++;
 			break;
 		case 3:
-			*data = pins.data;
+			*data = cpu_pins.data;
 			stage = 0;
 			registers.pc += 3;
 			break;
@@ -1166,17 +1166,17 @@ void do_load(uint8_t *data) {
 void do_load_zp(uint8_t *data) {
 	switch (stage) {
 		case 0:
-			pins.rw = 1;
-			pins.address = registers.pc + 1;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
 			stage++;
 			break;
 		case 1:
-			pins.rw = 1;
-			pins.address = pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address = cpu_pins.data;
 			stage++;
 			break;
 		case 2:
-			*data = pins.data;
+			*data = cpu_pins.data;
 			stage = 0;
 			registers.pc += 2;
 			break;
@@ -1187,12 +1187,12 @@ void do_load_lit(uint8_t *data) {
 
 		switch (stage) {
 			case 0:
-				pins.rw = 1;
-				pins.address = registers.pc + 1;
+				cpu_pins.rw = 1;
+				cpu_pins.address = registers.pc + 1;
 				stage++;
 				break;
 			case 1:
-				*data = pins.data;
+				*data = cpu_pins.data;
 				stage = 0;
 				registers.pc += 2;
 				break;
@@ -1202,20 +1202,20 @@ void do_load_lit(uint8_t *data) {
 void do_store(uint8_t data) {
 	switch (stage) {
 		case 0:
-			pins.rw = 1;
-			pins.address = registers.pc + 1;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
 			stage++;
 			break;
 		case 1:
-			temp[0] = pins.data;
-			pins.rw = 1;
-			pins.address = registers.pc + 2;
+			temp[0] = cpu_pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 2;
 			stage++;
 			break;
 		case 2:
-			pins.rw = 0;
-			pins.address = ((uint16_t) temp[0] << 8) | pins.data;
-			pins.data = data;
+			cpu_pins.rw = 0;
+			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.data = data;
 			stage++;
 			break;
 		case 3:
@@ -1228,14 +1228,14 @@ void do_store(uint8_t data) {
 void do_store_zp(uint8_t data) {
 	switch (stage) {
 		case 0:
-			pins.rw = 1;
-			pins.address = registers.pc + 1;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
 			stage++;
 			break;
 		case 1:
-			pins.rw = 0;
-			pins.address = pins.data;
-			pins.data = data;
+			cpu_pins.rw = 0;
+			cpu_pins.address = cpu_pins.data;
+			cpu_pins.data = data;
 			stage++;
 			break;
 		case 2:
@@ -1248,10 +1248,10 @@ void do_store_zp(uint8_t data) {
 void do_push(uint8_t data) {
 	switch (stage) {
 		case 0:
-			pins.rw = 0;
+			cpu_pins.rw = 0;
 			registers.sp++;
-			pins.address = 0x100 | registers.sp;
-			pins.data = data;
+			cpu_pins.address = 0x100 | registers.sp;
+			cpu_pins.data = data;
 			stage++;
 			break;
 		case 1:
@@ -1265,13 +1265,13 @@ void do_push(uint8_t data) {
 void do_pop(uint8_t *data) {
 	switch (stage) {
 		case 0:
-			pins.rw = 1;
-			pins.address = 0x100 | registers.sp;
+			cpu_pins.rw = 1;
+			cpu_pins.address = 0x100 | registers.sp;
 			registers.sp--;
 			stage++;
 			break;
 		case 1:
-			*data = pins.data;
+			*data = cpu_pins.data;
 			stage = 0;
 			registers.pc++;
 			break;
@@ -1282,21 +1282,21 @@ void do_bra(uint8_t mask) {
 	switch (stage) {
 		case 0:
 			if (registers.flags & mask) {
-				pins.rw = 1;
-				pins.address = registers.pc + 1;
+				cpu_pins.rw = 1;
+				cpu_pins.address = registers.pc + 1;
 				stage++;
 			} else {
 				registers.pc += 3;
 			}
 			break;
 		case 1:
-			registers.pc = ((uint16_t) pins.data) << 8;
-			pins.rw = 1;
-			pins.address = registers.pc + 2;
+			registers.pc = ((uint16_t) cpu_pins.data) << 8;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 2;
 			stage++;
 			break;
 		case 2:
-			registers.pc |= pins.data;
+			registers.pc |= cpu_pins.data;
 			stage = 0;
 			break;
 	}
@@ -1306,21 +1306,21 @@ void do_bran(uint8_t mask) {
 	switch (stage) {
 		case 0:
 			if (!(registers.flags & mask)) {
-				pins.rw = 1;
-				pins.address = registers.pc + 1;
+				cpu_pins.rw = 1;
+				cpu_pins.address = registers.pc + 1;
 				stage++;
 			} else {
 				registers.pc += 3;
 			}
 			break;
 		case 1:
-			registers.pc = ((uint16_t) pins.data) << 8;
-			pins.rw = 1;
-			pins.address = registers.pc + 2;
+			registers.pc = ((uint16_t) cpu_pins.data) << 8;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 2;
 			stage++;
 			break;
 		case 2:
-			registers.pc |= pins.data;
+			registers.pc |= cpu_pins.data;
 			stage = 0;
 			break;
 	}
@@ -1329,12 +1329,12 @@ void do_bran(uint8_t mask) {
 void do_compare_lit(uint8_t data) {
 	switch (stage) {
 		case 0:
-			pins.rw = 1;
-			pins.address = registers.pc + 1;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
 			stage++;
 			break;
 		case 1:
-			do_compare(data, pins.data);
+			do_compare(data, cpu_pins.data);
 			stage = 0;
 			registers.pc += 2;
 			break;
@@ -1349,36 +1349,36 @@ void do_reset() {
 	registers.acc = 0;
 	registers.flags = 0;
 	registers.sp = 0;
-	registers.pc = 0x0200;
+	registers.pc = 0x4000;
 
-	pins.address = 0;
-	pins.data = 0;
-	pins.interrupt = 0;
-	pins.rw = 1;
-	pins.reset = 0;
+	cpu_pins.address = 0;
+	cpu_pins.data = 0;
+	cpu_pins.interrupt = 0;
+	cpu_pins.rw = 1;
+	cpu_pins.reset = 0;
 }
 
 void do_interrupt() {
 	switch (stage) {
 		case 0:
-			pins.rw = 0;
+			cpu_pins.rw = 0;
 			registers.sp++;
-			pins.address = 0x100 | registers.sp;
-			pins.data = registers.flags;
+			cpu_pins.address = 0x100 | registers.sp;
+			cpu_pins.data = registers.flags;
 			stage++;
 			break;
 		case 1:
-			pins.rw = 0;
+			cpu_pins.rw = 0;
 			registers.sp++;
-			pins.address = 0x100 | registers.sp;
-			pins.data = registers.pc >> 8;
+			cpu_pins.address = 0x100 | registers.sp;
+			cpu_pins.data = registers.pc >> 8;
 			stage++;
 			break;
 		case 2:
-			pins.rw = 0;
+			cpu_pins.rw = 0;
 			registers.sp++;
-			pins.address = 0x100 | registers.sp;
-			pins.data = registers.pc;
+			cpu_pins.address = 0x100 | registers.sp;
+			cpu_pins.data = registers.pc;
 			stage++;
 			break;
 		case 3:

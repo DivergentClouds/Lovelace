@@ -2,12 +2,8 @@
 #define AUDIO_H
 
 #include <inttypes.h>
-#include <SDL2/SDL.h>
 #include <math.h>
 #include <stdlib.h>
-
-#define SAMPLE_RATE 44100
-#define AUDIO_BUFFER_SIZE 4096
 
 // registers
 
@@ -34,27 +30,21 @@ void reset_registers();
 // pins
 
 typedef struct {
-	uint8_t clock;
 	uint8_t reset;
 	uint8_t osc; // bitwise
 	uint8_t reg; // bitwise
 	uint8_t data; // bitwise
 	uint8_t rw;
 	float out;
-} pins_t;
+} audio_pins_t;
 
-typedef union {
-	pins_t pins;
-	uint8_t bytes[10];
-} pins_u;
-
-pins_u pins;
+audio_pins_t audio_pins;
 
 void reset_pins();
 
 // clock stuff
 
-void clock_actions();
+void do_audio_cycle();
 
 // audio samples
 
@@ -98,7 +88,5 @@ float highpass(float sample, uint8_t n, uint8_t osc, float butterworth_const);
 float smooth_volume[3];
 float smooth_low[3];
 float smooth_high[3];
-
-void audio_callback(void *data, Uint8 *stream, int len);
 
 #endif
