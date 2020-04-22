@@ -21,6 +21,36 @@ void do_cpu_cycle() {
 
 		if (interrupting) return;
 	} else switch (instruction) {
+		case STORE_IND_R0:
+			do_store_ind(registers.r[0]);
+			break;
+		case STORE_IND_R1:
+			do_store_ind(registers.r[1]);
+			break;
+		case STORE_IND_R2:
+			do_store_ind(registers.r[2]);
+			break;
+		case STORE_IND_R3:
+			do_store_ind(registers.r[3]);
+			break;
+		case STORE_IND_ACC:
+			do_store_ind(registers.acc);
+			break;
+		case STORE_IND_ZP_R0:
+			do_store_ind_zp(registers.r[0]);
+			break;
+		case STORE_IND_ZP_R1:
+			do_store_ind_zp(registers.r[1]);
+			break;
+		case STORE_IND_ZP_R2:
+			do_store_ind_zp(registers.r[2]);
+			break;
+		case STORE_IND_ZP_R3:
+			do_store_ind_zp(registers.r[3]);
+			break;
+		case STORE_IND_ZP_ACC:
+			do_store_ind_zp(registers.acc);
+			break;
 		case STORE_LIT:
 			switch (stage) {
 				case 0:
@@ -106,6 +136,36 @@ void do_cpu_cycle() {
 			break;
 		case STORE_ZP_ACC:
 			do_store_zp(registers.acc);
+			break;
+		case LOAD_IND_R0:
+			do_load_ind(&registers.r[0]);
+			break;
+		case LOAD_IND_R1:
+			do_load_ind(&registers.r[1]);
+			break;
+		case LOAD_IND_R2:
+			do_load_ind(&registers.r[2]);
+			break;
+		case LOAD_IND_R3:
+			do_load_ind(&registers.r[3]);
+			break;
+		case LOAD_IND_ACC:
+			do_load_ind(&registers.acc);
+			break;
+		case LOAD_IND_ZP_R0:
+			do_load_ind_zp(&registers.r[0]);
+			break;
+		case LOAD_IND_ZP_R1:
+			do_load_ind_zp(&registers.r[1]);
+			break;
+		case LOAD_IND_ZP_R2:
+			do_load_ind_zp(&registers.r[2]);
+			break;
+		case LOAD_IND_ZP_R3:
+			do_load_ind_zp(&registers.r[3]);
+			break;
+		case LOAD_IND_ZP_ACC:
+			do_load_ind_zp(&registers.acc);
 			break;
 		case LOAD_R0:
 			do_load(&registers.r[0]);
@@ -898,9 +958,9 @@ void do_cpu_cycle() {
 					stage++;
 					break;
 				case 1:
+					cpu_pins.address = registers.pc + 2;
 					registers.pc = ((uint16_t) cpu_pins.data) << 8;
 					cpu_pins.rw = 1;
-					cpu_pins.address = registers.pc + 2;
 					stage++;
 					break;
 				case 2:
@@ -965,6 +1025,10 @@ void do_cpu_cycle() {
 		cpu_pins.rw = 1;
 		cpu_pins.address = registers.pc;
 	}
+
+	//printf("PC = 0x%x\n", registers.pc);
+	//printf("OP = 0x%x\n", instruction);
+	//printf("R1 = 0x%x\n", registers.r[1]);
 }
 
 void do_compare(uint8_t a, uint8_t b) {
@@ -1199,6 +1263,75 @@ void do_load_lit(uint8_t *data) {
 		}
 }
 
+void do_load_ind(uint8_t *data) {
+	switch (stage) {
+		case 0:
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			temp[0] = cpu_pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 2;
+			stage++;
+			break;
+		case 2:
+			cpu_pins.rw = 1;
+			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			stage++;
+			break;
+		case 3:
+			temp[0] = cpu_pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address++;
+			stage++;
+			break;
+		case 4:
+			cpu_pins.rw = 1;
+			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			stage++;
+			break;
+		case 5:
+			stage = 0;
+			*data = cpu_pins.data;
+			registers.pc += 2;
+			break;
+	}
+}
+
+void do_load_ind_zp(uint8_t *data) {
+	switch (stage) {
+		case 0:
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			cpu_pins.rw = 1;
+			cpu_pins.address = cpu_pins.data;
+			stage++;
+			break;
+		case 2:
+			cpu_pins.rw = 1;
+			temp[0] = cpu_pins.data;
+			//printf("temp[0] = 0x%x\n", temp[0]);
+			cpu_pins.address++;
+			stage++;
+			break;
+		case 3:
+			cpu_pins.rw = 1;
+			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			stage++;
+			break;
+		case 4:
+			stage = 0;
+			*data = cpu_pins.data;
+			registers.pc += 2;
+			break;
+	}
+}
+
 void do_store(uint8_t data) {
 	switch (stage) {
 		case 0:
@@ -1239,6 +1372,74 @@ void do_store_zp(uint8_t data) {
 			stage++;
 			break;
 		case 2:
+			stage = 0;
+			registers.pc += 2;
+			break;
+	}
+}
+
+void do_store_ind(uint8_t data) {
+	switch (stage) {
+		case 0:
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			temp[0] = cpu_pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 2;
+			stage++;
+			break;
+		case 2:
+			cpu_pins.rw = 1;
+			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			stage++;
+			break;
+		case 3:
+			temp[0] = cpu_pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address++;
+			stage++;
+			break;
+		case 4:
+			cpu_pins.rw = 0;
+			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.data = data;
+			stage++;
+			break;
+		case 5:
+			stage = 0;
+			registers.pc += 2;
+			break;
+	}
+}
+
+void do_store_ind_zp(uint8_t data) {
+	switch (stage) {
+		case 0:
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			cpu_pins.rw = 1;
+			cpu_pins.address = cpu_pins.data;
+			stage++;
+			break;
+		case 2:
+			temp[0] = cpu_pins.data;
+			cpu_pins.rw = 1;
+			cpu_pins.address++;
+			stage++;
+			break;
+		case 3:
+			cpu_pins.rw = 0;
+			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.data = data;
+			stage++;
+			break;
+		case 4:
 			stage = 0;
 			registers.pc += 2;
 			break;
@@ -1290,9 +1491,9 @@ void do_bra(uint8_t mask) {
 			}
 			break;
 		case 1:
-			registers.pc = ((uint16_t) cpu_pins.data) << 8;
 			cpu_pins.rw = 1;
 			cpu_pins.address = registers.pc + 2;
+			registers.pc = ((uint16_t) cpu_pins.data) << 8;
 			stage++;
 			break;
 		case 2:
@@ -1314,9 +1515,9 @@ void do_bran(uint8_t mask) {
 			}
 			break;
 		case 1:
-			registers.pc = ((uint16_t) cpu_pins.data) << 8;
 			cpu_pins.rw = 1;
 			cpu_pins.address = registers.pc + 2;
+			registers.pc = ((uint16_t) cpu_pins.data) << 8;
 			stage++;
 			break;
 		case 2:
@@ -1349,7 +1550,7 @@ void do_reset() {
 	registers.acc = 0;
 	registers.flags = 0;
 	registers.sp = 0;
-	registers.pc = 0x4000;
+	registers.pc = 0x3FFF;
 
 	cpu_pins.address = 0;
 	cpu_pins.data = 0;

@@ -13,8 +13,8 @@ void audio_callback(void *data, Uint8 *stream, int len) {
 		for (int j = 0; j < 40; j++) {
 			do_cpu_cycle();
 			do_controller_cycle();
+			do_audio_cycle();
 		}
-		do_audio_cycle();
 		generate_sample();
 		fstream[i] = audio_pins.out;
 	}
@@ -45,6 +45,10 @@ int main(int argc, char const **argv) {
 	reset_pins();
 	srand(0x7EA75);
 
+	cpu_pins.reset = 1;
+	do_cpu_cycle();
+	cpu_pins.reset = 0;
+
 	// play audio
 
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
@@ -58,11 +62,8 @@ int main(int argc, char const **argv) {
 
 	// generate audio
 
-	should_close = 0;
-
-	while (!should_close) {
+	while (registers.pc < 0xFFFF)
 		SDL_Delay(1);
-	}
 
 	// cleanup
 

@@ -13,11 +13,14 @@ void reset_registers() {
 
 // pins
 
-// void reset_pins() {
-// 	for (int pin = 0; pin < 10; pin++) {
-// 		audio_pins.bytes[pin] = 0;
-// 	}
-// }
+void reset_pins() {
+	audio_pins.reset = 0;
+	audio_pins.osc = 0;
+	audio_pins.reg = 0;
+	audio_pins.data = 0;
+	audio_pins.rw = 0;
+	audio_pins.out = 0;
+}
 
 // clock stuff
 

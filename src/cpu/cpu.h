@@ -32,7 +32,7 @@ uint8_t interrupting;
 
 // misc functions
 
-void do_cpu_cycle(); 
+void do_cpu_cycle();
 
 void do_compare(uint8_t a, uint8_t b);
 void do_add(uint8_t value);
@@ -52,12 +52,19 @@ void do_load(uint8_t *data);
 void do_load_zp(uint8_t *data);
 void do_load_lit(uint8_t *data);
 
+void do_store_ind(uint8_t data);
+void do_store_ind_zp(uint8_t data);
+void do_load_ind(uint8_t *data);
+void do_load_ind_zp(uint8_t *data);
+
+
 void do_push(uint8_t data);
 void do_pop(uint8_t *data);
 
 void do_bra(uint8_t mask);
 void do_bran(uint8_t mask);
 void do_compare_lit(uint8_t data);
+
 
 // opcodes
 
@@ -180,7 +187,6 @@ void do_compare_lit(uint8_t data);
 #define DEC_R3 0x76
 #define DEC_ACC 0x77
 
-// zero page mode?
 #define JSR_0 0x7F
 #define RET_0 0x80
 #define RETI_0 0x81
@@ -249,5 +255,26 @@ void do_compare_lit(uint8_t data);
 #define CLEAR_O 0xD2
 #define CLEAR_G 0xD3
 #define CLEAR_Z 0xD4
+
+#define LOAD_IND_R0 0xD5
+#define LOAD_IND_R1 0xD6
+#define LOAD_IND_R2 0xD7
+#define LOAD_IND_R3 0xD8
+#define LOAD_IND_ACC 0xD9
+#define LOAD_IND_ZP_R0 0xDA
+#define LOAD_IND_ZP_R1 0xDB
+#define LOAD_IND_ZP_R2 0xDC
+#define LOAD_IND_ZP_R3 0xDD
+#define LOAD_IND_ZP_ACC 0xDE
+#define STORE_IND_R0 0xDF
+#define STORE_IND_R1 0xE0
+#define STORE_IND_R2 0xE1
+#define STORE_IND_R3 0xE2
+#define STORE_IND_ACC 0xE3
+#define STORE_IND_ZP_R0 0xE4
+#define STORE_IND_ZP_R1 0xE5
+#define STORE_IND_ZP_R2 0xE6
+#define STORE_IND_ZP_R3 0xE7
+#define STORE_IND_ZP_ACC 0xE8
 
 #endif
