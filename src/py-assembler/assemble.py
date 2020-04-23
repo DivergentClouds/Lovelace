@@ -1,4 +1,5 @@
 import argparse
+import ast
 
 mnemonics = {
 	"NOP": {
@@ -351,12 +352,14 @@ if __name__ == "__main__":
 	p.add_argument("file", help="an input assembly file")
 	p.add_argument("-o", "--output", default="harriet.o",
 		help="the output filename")
+	p.add_argument("-f", "--offset", default="0x0200", type=ast.literal_eval,
+		help="the address offset to use for labels")
 
 	args = p.parse_args()
 	with open(args.file) as f:
 		source = f.read()
 
-	code = bytes(compile(source))
+	code = bytes(compile(source, args.offset))
 
 	with open(args.output, "wb") as f:
 		f.write(code)
