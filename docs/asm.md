@@ -1,8 +1,6 @@
 # Harriet
 ## Assembly
 
-### Syntax
-
 - Numbers
  - Hexadecimal numbers must be prefixed with `$`
  - Binary numbers must be prefixed with `%`
@@ -80,6 +78,7 @@
 	- Opcodes:
 	 - 0x00
 		- 1 Cycle
+		- NOP
  - STR \<reg/acc/lit> \<adr/zp>
 	- Stores data from source operand to destination address
 	- Opcodes:
@@ -284,18 +283,6 @@
 		- 0x47
 			- 1 cycle
 			- TRN r3 acc
-		- 0x48
-			- 1 cycle
-			- TRN acc r0
-		- 0x49
-			- 1 cycle
-			- TRN acc r1
-		- 0x4A
-			- 1 cycle
-			- TRN acc r2
-		- 0x4B
-			- 1 cycle
-			- TRN acc r3
 		- 0x48
 			- 1 cycle
 			- TRN acc r0
@@ -729,27 +716,27 @@
 		- 0xdf
 			- 3 cycles if jump, 1 otherwise
 			- BRA Z
- - BRN \<flg> \<adr>
+ - BRAN \<flg> \<adr>
 	- Acts like a JMP conditional on the flag being clear.
 	- Opcodes:
 		- 0xe0
 			- 3 cycles if jump, 1 otherwise
-			- BRN S
+			- BRAN S
 		- 0xe1
 			- 3 cycles if jump, 1 otherwise
-			- BRN C
+			- BRAN C
 		- 0xe2
 			- 3 cycles if jump, 1 otherwise
-			- BRN I
+			- BRAN I
 		- 0xe3
 			- 3 cycles if jump, 1 otherwise
-			- BRN O
+			- BRAN O
 		- 0xe4
 			- 3 cycles if jump, 1 otherwise
-			- BRN G
+			- BRAN G
 		- 0xe5
 			- 3 cycles if jump, 1 otherwise
-			- BRN Z
+			- BRAN Z
  - JMP \<adr>
 	- Sets the program counter to the address.
 	- Opcodes:
@@ -777,24 +764,24 @@
 		- 0xf4
 			- 1 cycle
 			- SET Z
- - CLEAR \<flg>
+ - CLR \<flg>
 	- Clears a given flag.
 	- Opcodes:
 		- 0xf5
 			- 1 cycle
-			- CLEAR S
+			- CLR S
 		- 0xf6
 			- 1 cycle
-			- CLEAR C
+			- CLR C
 		- 0xf7
 			- 1 cycle
-			- CLEAR I
+			- CLR I
 		- 0xf8
 			- 1 cycle
-			- CLEAR O
+			- CLR O
 		- 0xf9
 			- 1 cycle
-			- CLEAR G
+			- CLR G
 		- 0xfa
 			- 1 cycle
-			- CLEAR Z
+			- CLR Z

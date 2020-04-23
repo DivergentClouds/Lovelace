@@ -45,7 +45,7 @@ float note_freq(uint8_t note, uint8_t bend) {
 }
 
 float pulse_wave(float phase, uint8_t width) {
-	return phase < width / 256.0 ? 1.0 : -1.0;
+	return phase < (width / 512.0 + 0.5) ? 1.0 : -1.0;
 }
 
 float saw_wave(float phase) {
@@ -130,7 +130,7 @@ float lowpass(float sample, uint8_t n, uint8_t osc, float butterworth_const) {
 	c2 = cutoff * cutoff;
 	a0 = reciprocal_pi_squared + butterworth_const + c2;
 
-	if (oscillators[osc].oscillator.low == 255) {
+	if (oscillators[osc].oscillator.low == 0) {
 		result = sample;
 	} else {
 		result =
