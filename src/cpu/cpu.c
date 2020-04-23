@@ -376,6 +376,10 @@ void do_cpu_cycle() {
 			do_add(registers.r[3]);
 			registers.pc++;
 			break;
+		case ADD_ACC:
+			do_add(registers.acc);
+			registers.pc++;
+			break;
 		case ADDC_R0:
 			do_addc(registers.r[0]);
 			registers.pc++;
@@ -390,6 +394,10 @@ void do_cpu_cycle() {
 			break;
 		case ADDC_R3:
 			do_addc(registers.r[3]);
+			registers.pc++;
+			break;
+		case ADDC_ACC:
+			do_addc(registers.acc);
 			registers.pc++;
 			break;
 		case SUB_LIT:
@@ -1248,19 +1256,18 @@ void do_load_zp(uint8_t *data) {
 }
 
 void do_load_lit(uint8_t *data) {
-
-		switch (stage) {
-			case 0:
-				cpu_pins.rw = 1;
-				cpu_pins.address = registers.pc + 1;
-				stage++;
-				break;
-			case 1:
-				*data = cpu_pins.data;
-				stage = 0;
-				registers.pc += 2;
-				break;
-		}
+	switch (stage) {
+		case 0:
+			cpu_pins.rw = 1;
+			cpu_pins.address = registers.pc + 1;
+			stage++;
+			break;
+		case 1:
+			*data = cpu_pins.data;
+			stage = 0;
+			registers.pc += 2;
+			break;
+	}
 }
 
 void do_load_ind(uint8_t *data) {
