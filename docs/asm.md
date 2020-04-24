@@ -1,85 +1,85 @@
 # Harriet
 ## Assembly
 
-- Numbers
- - Hexadecimal numbers must be prefixed with `$`
- - Binary numbers must be prefixed with `%`
- - Decimal numbers may optionally be prefixed with `!`
- - Literals must be prefixed with `#` otherwise it is an address
- 	- `#` must come before `$`, `%`, or `!`
- - Examples
+### Numbers
+- Hexadecimal numbers must be prefixed with `$`
+- Binary numbers must be prefixed with `%`
+- Decimal numbers may optionally be prefixed with `!`
+- Literals must be prefixed with `#` otherwise it is an address
+	- `#` must come before `$`, `%`, or `!`
+- Examples
 	- `#$10`
-	 - 16 as a literal
+	- 16 as a literal
 	- `#%10`
-	 - 2 as a literal
+	- 2 as a literal
 	- `#!10` or `#10`
-	 - 10 as a literal
+	- 10 as a literal
 	- `$80`
-	 - the address `128`
+	- the address `128`
 	- `$280`
-	 - the address `640`
+	- the address `640`
 
-- Labels (note: not for mini-assembler)
- - Labels can be used in place of an address to jump to where the label was defined
- - Labels are prefixed with `:` and can be accessed anywhere in the file
- - Example
+### Labels (note: not for mini-assembler)
+	- Labels can be used in place of an address to jump to where the label was defined
+	- Labels are prefixed with `:` and can be accessed anywhere in the file
+	- Example
  ```
 :label
 JMP :label
 ```
-- Flags
- - S
+### Flags
+- S
 	- Sign
 	- x0000000
 	- Set by instructions with a numerical result if that result is negative.
- - C
+- C
 	- Carry
 	- 0x000000
 	- Set by arithmetic instructions if a 1 bit in the 9th position was truncated.
- - I
+- I
 	- Interrupt Disable
 	- 00x00000
 	- Only manually set. Controls whether or not interrupts happen.
- - O
+- O
 	- Overflow
 	- 000x0000
 	- Set by arithmetic instructions if the sign of the result is affected by truncation.
- - G
+- G
 	- Greater
 	- 000000x0
 	- Only set by the CMP instruction if the first operand is greater than the second.
- - Z
+- Z
 	- Zero
 	- 0000000x
 	- Set by instructions with a numerical result if that result is 0.
 	- Also set by CMP if its two operands are equal.
 
 
-- Comments (note: not for mini-assembler)
- - Anything following a `;` on a line is a comment and is not compiled
+### Comments (note: not for mini-assembler)
+	- Anything following a `;` on a line is a comment and is not compiled
 
-- CPU/ASM Notes
-  - HarrietCPU is big-endian system
-  - Instruction operands are written in form \<source> \<destination>
-  - All operands are 8-bit except adr which is 16-bit
+### CPU/ASM Notes
+	- HarrietCPU is big-endian system
+	- Instruction operands are written in form \<source> \<destination>
+	- All operands are 8-bit except adr which is 16-bit
 
-- Documentation Notes
-  - reg means `r0`, `r1`, `r2`, or `r3`
-  - acc means the accumulator
-  - lit means 8-bit literal
-  - flg means the flags register
-  - sp means the stack poiner
-  - adr means address
-  - zp means zeropage address
+### Documentation Notes
+	- reg means `r0`, `r1`, `r2`, or `r3`
+	- acc means the accumulator
+	- lit means 8-bit literal
+	- flg means the flags register
+	- sp means the stack poiner
+	- adr means address
+	- zp means zeropage address
 
-- Instructions
- - NOP
+### Instructions
+- NOP
 	- No operation
 	- Opcodes:
-	 - 0x00
+	- 0x00
 		- 1 Cycle
 		- NOP
- - STR \<reg/acc/lit> \<adr/zp>
+- STR \<reg/acc/lit> \<adr/zp>
 	- Stores data from source operand to destination address
 	- Opcodes:
 		- 0x09
@@ -118,7 +118,7 @@ JMP :label
 		- 0x14
 			- 3 cycles
 			- STR lit \<zp>
- - STRI \<reg/acc/lit> \<adr/zp>
+- STRI \<reg/acc/lit> \<adr/zp>
 	- Stores data from source operand to address pointed to by destination address
 	- Opcodes:
 		- 0x15
@@ -151,7 +151,7 @@ JMP :label
 		- 0x1E
 			- 5 cycles
 			- STRI acc \<zp>
- - LOD \<lit/adr/zp> \<reg/acc>
+- LOD \<lit/adr/zp> \<reg/acc>
 	- Loads data from source operand into destination register
 	- Opcodes:
 		- 0x1F
@@ -199,7 +199,7 @@ JMP :label
 		- 0x2D
 			- 2 cycles
 			- LOD \<lit> acc
- - LODI \<adr/zp> \<reg/acc>
+- LODI \<adr/zp> \<reg/acc>
 	- Loads data from address pointed to by source address into destination register
 	- Opcodes:
 		- 0x2E
@@ -232,7 +232,7 @@ JMP :label
 		- 0x37
 			- 5 cycles
 			- LODI \<zp> acc
- - TRN \<reg/acc/sp/flg> \<reg/acc>
+- TRN \<reg/acc/sp/flg> \<reg/acc>
 	- Copies value from source register to destination register
 	- Opcodes:
 		- 0x38
@@ -325,7 +325,7 @@ JMP :label
 		- 0x55
 			- 1 cycle
 			- TRN flg acc
- - ADD \<reg/acc/lit>
+- ADD \<reg/acc/lit>
 	- Adds the source to the accumulator, setting some flags.
 	- Flags: S, Z, O, C
 	- Opcodes:
@@ -347,7 +347,7 @@ JMP :label
 		- 0x63
 			- 2 cycles
 			- ADD \<lit>
- - ADDC \<reg/acc/lit>
+- ADDC \<reg/acc/lit>
 	- Adds the source and the carry flag to the accumulator, setting some flags.
 	- Flags: S, Z, O, C
 	- Opcodes:
@@ -369,7 +369,7 @@ JMP :label
 		- 0x69
 			- 2 cycles
 			- ADDC \<lit>
- - SUB \<reg/lit>
+- SUB \<reg/lit>
 	- Subtracts the source to the accumulator, setting some flags.
 	- Flags: S, Z, O, C
 	- Opcodes:
@@ -388,7 +388,7 @@ JMP :label
 		- 0x6e
 			- 2 cycles
 			- SUB \<lit>
- - SUBC \<reg/lit>
+- SUBC \<reg/lit>
 	- Subtracts the source and the carry flag to the accumulator, setting some flags.
 	- Flags: S, Z, O, C
 	- Opcodes:
@@ -407,7 +407,7 @@ JMP :label
 		- 0x73
 			- 2 cycles
 			- SUBC \<lit>
- - SHR \<reg/acc/lit>
+- SHR \<reg/acc/lit>
 	- Bitshifts the accumulator to the right, setting some flags.
 	- Flags: S, Z
 	- Opcodes:
@@ -429,7 +429,7 @@ JMP :label
 		- 0x79
 			- 2 cycles
 			- SHR \<lit>
- - SHL \<reg/acc/lit>
+- SHL \<reg/acc/lit>
 	- Bitshifts the accumulator to the left, setting some flags.
 	- Flags: S, Z
 	- Opcodes:
@@ -451,7 +451,7 @@ JMP :label
 		- 0x7f
 			- 2 cycles
 			- SHL \<lit>
- - AND \<reg/lit>
+- AND \<reg/lit>
 	- Applies a bitwise and to the accumulator, setting some flags.
 	- Flags: S, Z
 	- Opcodes:
@@ -470,7 +470,7 @@ JMP :label
 		- 0x84
 			- 2 cycles
 			- AND \<lit>
- - OR \<reg/lit>
+- OR \<reg/lit>
 	- Applies a bitwise or to the accumulator, setting some flags.
 	- Flags: S, Z
 	- Opcodes:
@@ -489,7 +489,7 @@ JMP :label
 		- 0x89
 			- 2 cycles
 			- OR \<lit>
- - XOR \<reg/lit>
+- XOR \<reg/lit>
 	- Applies a bitwise xor to the accumulator, setting some flags.
 	- Flags: S, Z
 	- Opcodes:
@@ -508,14 +508,14 @@ JMP :label
 		- 0x8e
 			- 2 cycles
 			- XOR \<lit>
- - NOT
+- NOT
 	- Applies a bitwise not to the accumulator, setting some flags.
 	- Flags: S, Z
 	- Opcodes:
 		- 0x8f
 			- 1 cycle
 			- NOT
- - INC \<reg/acc>
+- INC \<reg/acc>
 	- Adds 1 to the argument, setting some flags.
 	- Flags: S, Z, O, C
 	- Opcodes:
@@ -534,7 +534,7 @@ JMP :label
 		- 0x94
 			- 1 cycle
 			- INC acc
- - DEC \<reg/acc>
+- DEC \<reg/acc>
 	- Subtracts 1 to the argument, setting some flags.
 	- Flags: S, Z, O, C
 	- Opcodes:
@@ -553,25 +553,25 @@ JMP :label
 		- 0x99
 			- 1 cycle
 			- DEC acc
- - JSR \<adr>
+- JSR \<adr>
 	- Pushes the PC to the stack and jumps to the given address.
 	- Opcodes:
 		- 0xa2
 			- 5 cycles
 			- JSR \<adr>
- - RET
+- RET
 	- Pops an address off of the stack and jumps to it.
 	- Opcodes:
 		- 0xa3
 			- 3 cycles
 			- RET
- - RETI
+- RETI
 	- Pops an address off of the stack and jumps to it. Also pops the flags register.
 	- Opcodes:
 		- 0xa4
 			- 4 cycles
 			- RETI
- - PSH \<reg/acc/lit>
+- PSH \<reg/acc/lit>
 	- Pushes a value to the stack. This increments the stack pointer.
 	- Opcodes:
 		- 0xad
@@ -592,7 +592,7 @@ JMP :label
 		- 0xb2
 			- 3 cycles
 			- PUSH \<lit>
- - POP \<reg/acc>
+- POP \<reg/acc>
 	- Pops a value from the stack. This decrements the stack pointer.
 	- Opcodes:
 		- 0xb3
@@ -610,13 +610,13 @@ JMP :label
 		- 0xb7
 			- 2 cycles
 			- POP acc
- - DRP
+- DRP
 	- Drops a value from the stack. This decrements the stack pointer.
 	- Opcodes:
 		- 0xb8
 			- 1 cycle
 			- DROP
- - CMP \<reg/acc> \<reg/acc/lit>
+- CMP \<reg/acc> \<reg/acc/lit>
 	- Compares two values. The Z flag is set if they are equal, and the G flag is set if the first is greater than the second.
 	- Note that comparisons are unsigned.
 	- Opcodes:
@@ -695,7 +695,7 @@ JMP :label
 		- 0xd9
 			- 2 cycles
 			- CMP acc \<lit>
- - BRA \<flg> \<adr>
+- BRA \<flg> \<adr>
 	- Acts like a JMP conditional on the flag being set.
 	- Opcodes:
 		- 0xda
@@ -716,7 +716,7 @@ JMP :label
 		- 0xdf
 			- 3 cycles if jump, 1 otherwise
 			- BRA Z
- - BRAN \<flg> \<adr>
+- BRAN \<flg> \<adr>
 	- Acts like a JMP conditional on the flag being clear.
 	- Opcodes:
 		- 0xe0
@@ -737,13 +737,13 @@ JMP :label
 		- 0xe5
 			- 3 cycles if jump, 1 otherwise
 			- BRAN Z
- - JMP \<adr>
+- JMP \<adr>
 	- Sets the program counter to the address.
 	- Opcodes:
 		- 0xe6
 			- 3 cycles
 			- JMP \<adr>
- - SET \<flg>
+- SET \<flg>
 	- Sets a given flag.
 	- Opcodes:
 		- 0xef
@@ -764,7 +764,7 @@ JMP :label
 		- 0xf4
 			- 1 cycle
 			- SET Z
- - CLR \<flg>
+- CLR \<flg>
 	- Clears a given flag.
 	- Opcodes:
 		- 0xf5
