@@ -1,5 +1,6 @@
 import argparse
 import ast
+from functools import partial
 
 mnemonics = {
 	"NOP": {
@@ -237,12 +238,6 @@ mnemonics = {
 		"O ADR": 0xdd,
 		"G ADR": 0xde,
 		"Z ADR": 0xdf,
-		"S ZP": 0xda,
-		"C ZP": 0xdb,
-		"I ZP": 0xdc,
-		"O ZP": 0xdd,
-		"G ZP": 0xde,
-		"Z ZP": 0xdf,
 	},
 	"BRAN": {
 		"S ADR": 0xe0,
@@ -251,16 +246,9 @@ mnemonics = {
 		"O ADR": 0xe3,
 		"G ADR": 0xe4,
 		"Z ADR": 0xe5,
-		"S ZP": 0xe0,
-		"C ZP": 0xe1,
-		"I ZP": 0xe2,
-		"O ZP": 0xe3,
-		"G ZP": 0xe4,
-		"Z ZP": 0xe5
 	},
 	"JMP": {
 		"ADR": 0xe6,
-		"ZP": 0xe6,
 	},
 	"SET": {
 		"S": 0xef,
@@ -290,7 +278,7 @@ def parse_number(arg):
 	if arg.startswith("%"):
 		return int(arg[1:], 2)
 
-def interpret_argument(arg):
+def interpret_argument(arg, instruction):
 	if arg.startswith(":"):
 		return "ADR"
 	elif arg.startswith("R"):
@@ -300,7 +288,7 @@ def interpret_argument(arg):
 	elif arg.startswith("#"):
 		return "LIT"
 	elif arg[0] in "0123456789$%!":
-		if parse_number(arg) < 256:
+		if parse_number(arg) < 256 and instruction in ["STR", "STRI", "LOD", "LODI"]:
 			return "ZP"
 		else:
 			return "ADR"
@@ -309,10 +297,20 @@ def interpret_argument(arg):
 	else:
 		raise Exception("Invalid argument")
 
+def argument_size(arg):
+	if arg == "ADR":
+		return 2
+	if arg == "ZP":
+		return 1
+	if arg == "LIT":
+		return 1
+	return 0
+
 # Possibly make addresses controlled by floppy controller
 def compile(source, location=0x0200):
 	labels = {}
 	instructions = []
+	length = 0
 
 	for line in source.split("\n"):
 		parts = line.strip().upper().split(";")[0].split()
@@ -322,30 +320,32 @@ def compile(source, location=0x0200):
 
 		if parts[0].startswith(":"):
 			assert len(parts) == 1, "Whitespace isn't allowed in label names"
-			labels[parts[0][1:]] = len(instructions) + location
+			labels[parts[0][1:]] = length + location
 		else:
 			assert parts[0] in mnemonics, "Unrecognized mnemonic"
 			instructions.append(parts)
+
+			length += 1 + sum(map(argument_size,
+				map(partial(interpret_argument, instruction=parts[0]), parts[1:])))
 
 	for instruction in instructions:
 		print(instruction)
 
 		yield mnemonics[instruction[0]][
-			" ".join(map(interpret_argument, instruction[1:]))]
+			" ".join(map(partial(interpret_argument, instruction=instruction[0]), instruction[1:]))]
 
 		for arg in instruction[1:]:
-			if interpret_argument(arg) == "ADR" or (
-					interpret_argument(arg) == "ZP"
-					and instruction[0] not in ["STR", "STRI", "LOD", "LODI"]):
+			type = interpret_argument(arg, instruction[0])
+			if type == "ADR":
 				if arg[0] == ":":
 					address = labels[arg[1:]]
 				else:
 					address = parse_number(arg)
 				yield address >> 8
 				yield address & 0xff
-			elif interpret_argument(arg) == "ZP":
+			elif type == "ZP":
 				yield parse_number(arg)
-			elif interpret_argument(arg) == "LIT":
+			elif type == "LIT":
 				yield parse_number(arg[1:])
 
 

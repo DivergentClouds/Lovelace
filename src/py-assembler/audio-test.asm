@@ -1,6 +1,6 @@
 ; Harriet Audio Test
 
-jmp		$4026			; jump to copy routine (no need to return)
+jmp		:copy			; jump to copy routine (no need to return)
 
 str		#3 		$3FFF 	; switch from rom bank to audio bank
 str		#0 		$4001 	; switch to oscillator 0
@@ -29,6 +29,6 @@ stri	r1		$2		; indirect store from address pointed to by $0003
 inc		r0				; increment r0
 
 cmp		r0		#$26	; compare desired number of bits copied + 3 with r1
-bran	Z		$402D	; if not equal branch to :loop
+bran	Z		:loop	; if not equal branch to :loop
 
 jmp		$203			; jump to audio code
