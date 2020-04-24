@@ -1032,11 +1032,12 @@ void do_cpu_cycle() {
 	if (stage == 0) {
 		cpu_pins.rw = 1;
 		cpu_pins.address = registers.pc;
-	}
 
-	//printf("PC = 0x%x\n", registers.pc);
-	//printf("OP = 0x%x\n", instruction);
-	//printf("R1 = 0x%x\n", registers.r[1]);
+		// printf("\nPC = 0x%x\n", registers.pc);
+		// printf("OP = 0x%x\n", instruction);
+		// printf("R0 = 0x%x\n", registers.r[0]);
+		// printf("R1 = 0x%x\n", registers.r[1]);
+	}
 }
 
 void do_compare(uint8_t a, uint8_t b) {
@@ -1449,6 +1450,7 @@ void do_store_ind_zp(uint8_t data) {
 		case 4:
 			stage = 0;
 			registers.pc += 2;
+			printf("R1 = 0x%x\n", registers.r[1]);
 			break;
 	}
 }

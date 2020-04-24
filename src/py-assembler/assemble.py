@@ -328,6 +328,8 @@ def compile(source, location=0x0200):
 			instructions.append(parts)
 
 	for instruction in instructions:
+		print(instruction)
+
 		yield mnemonics[instruction[0]][
 			" ".join(map(interpret_argument, instruction[1:]))]
 
