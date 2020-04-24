@@ -56,21 +56,21 @@ JMP :label
 
 
 ### Comments (note: not for mini-assembler)
-	- Anything following a `;` on a line is a comment and is not compiled
+- Anything following a `;` on a line is a comment and is not compiled
 
 ### CPU/ASM Notes
-	- HarrietCPU is big-endian system
-	- Instruction operands are written in form \<source> \<destination>
-	- All operands are 8-bit except adr which is 16-bit
+- HarrietCPU is big-endian system
+- Instruction operands are written in form \<source> \<destination>
+- All operands are 8-bit except adr which is 16-bit
 
 ### Documentation Notes
-	- reg means `r0`, `r1`, `r2`, or `r3`
-	- acc means the accumulator
-	- lit means 8-bit literal
-	- flg means the flags register
-	- sp means the stack poiner
-	- adr means address
-	- zp means zeropage address
+- reg means `r0`, `r1`, `r2`, or `r3`
+- acc means the accumulator
+- lit means 8-bit literal
+- flg means the flags register
+- sp means the stack poiner
+- adr means address
+- zp means zeropage address
 
 ### Instructions
 - NOP
