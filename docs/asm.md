@@ -23,10 +23,10 @@
  - Labels can be used in place of an address to jump to where the label was defined
  - Labels are prefixed with `:` and can be accessed anywhere in the file
  - Example
-	- ```
-	:label
-	JMP :label
-	```
+ ```
+:label
+JMP :label
+```
 - Flags
  - S
 	- Sign
