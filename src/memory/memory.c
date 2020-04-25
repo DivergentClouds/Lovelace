@@ -10,8 +10,11 @@ void do_controller_cycle() {
 			global_memory[cpu_pins.address] = cpu_pins.data;
 	} else if (cpu_pins.address > 0x3FFF) {
 		if (bank == 0) {
-			// assume read and correct address
-			cpu_pins.data = rom[cpu_pins.address - 0x4000];
+			// assume read
+			if (cpu_pins.address - 0x4000 < 0xF00)
+				cpu_pins.data = rom[cpu_pins.address - 0x4000];
+			else
+				cpu_pins.data = 0;
 		} else if (bank == 1) {
 			// keyboard
 		} else if (bank == 2) {

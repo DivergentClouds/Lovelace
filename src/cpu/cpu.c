@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include "../clock/clock.h"
 
 void do_reset();
 void do_interrupt();
@@ -1024,6 +1025,10 @@ void do_cpu_cycle() {
 		case CLEAR_Z:
 			registers.flags &= 0b11111110;
 			registers.pc++;
+			break;
+		case 0xFF: // not for final release
+			should_close = 1;
+			stage = 1;
 			break;
 		default:
 			registers.pc++;

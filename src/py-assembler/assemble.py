@@ -178,7 +178,7 @@ mnemonics = {
 		"LIT": 0x99,
 	},
 	"JSR": {
-		"": 0xa2,
+		"ADR": 0xa2,
 	},
 	"RET": {
 		"": 0xa3,

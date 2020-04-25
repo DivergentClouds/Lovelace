@@ -20,7 +20,7 @@
    - b is pulse width
  - Note/pitch
    - `0nnnnnnn`
-   - 128 notes; note 0 is 0hz, notes 1 - 127 are a0 - c8
+   - 128 notes; note 0 is 0hz, notes 1 - 127 are c0 - f9
    - `bbbbbbbb`
    - 256 pitch bend levels
  - Phase

@@ -5,11 +5,14 @@ jmp		:copy			; jump to copy routine (no need to return)
 str		#3 		$3FFF 	; switch from rom bank to audio bank
 str		#0 		$4001 	; switch to oscillator 0
 str		#2 		$4002 	; switch to waveform register
-str		#0 		$4003 	; set to pulse
+str		#2 		$4003 	; set to triangle
 str		#4 		$4002 	; switch to note register
-str		#$40	$4003	; set note to 64 (C6)
+str		#$31	$4003	; set note to 49 (C4)
 str		#7		$4002	; switch to volume register
-str		#$20	$4003	; set volume to 32
+str		#$48	$4003	; set volume to 72
+
+; 0x223
+
 
 jmp		$223			; loop forever
 

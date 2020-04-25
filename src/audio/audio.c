@@ -45,7 +45,7 @@ float note_freq(uint8_t note, uint8_t bend) {
 }
 
 float pulse_wave(float phase, uint8_t width) {
-	return phase < (width / 512.0 + 0.5) ? 1.0 : -1.0;
+	return phase < width / 256.0 ? 1.0 : -1.0;
 }
 
 float saw_wave(float phase) {
@@ -83,13 +83,17 @@ float render_oscillator(uint8_t n) {
 			* smooth_volume[n];
 	else // 0b11
 		return noise_wave()
-		* smooth_volume[n];
+		* smooth_volume[n]
+		* (pulse_wave(fmod(phases[n] +
+			oscillators[n].oscillator.phase / 256.0, 1),
+			oscillators[n].oscillator.width) / 2 + .5);
 }
 
 void generate_sample() {
 	for (int i = 0; i < 3; i++)
 		smooth_volume[i] = (smooth_volume[i] * 19 +
-				oscillators[i].oscillator.volume / 255.0) / 20;
+				(oscillators[i].oscillator.volume / 255.0) *
+				(oscillators[i].oscillator.volume / 255.0)) / 20;
 
 	for (int i = 0; i < 3; i++)
 		smooth_low[i] = (smooth_low[i] * 199 +

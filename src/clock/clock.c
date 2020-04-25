@@ -3,8 +3,6 @@
 #include "../memory/memory.h"
 #include "../cpu/cpu.h"
 
-uint8_t should_close;
-
 void audio_callback(void *data, Uint8 *stream, int len) {
 	float *fstream;
 
@@ -16,7 +14,7 @@ void audio_callback(void *data, Uint8 *stream, int len) {
 			do_audio_cycle();
 		}
 		generate_sample();
-		fstream[i] = audio_pins.out;
+		fstream[i] = audio_pins.out * 0.75;
 	}
 }
 
@@ -62,7 +60,7 @@ int main(int argc, char const **argv) {
 
 	// generate audio
 
-	while (registers.pc < 0xFFFF)
+	while (!should_close)
 		SDL_Delay(1);
 
 	// cleanup
