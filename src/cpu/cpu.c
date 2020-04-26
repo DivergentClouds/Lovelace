@@ -1,5 +1,6 @@
 #include "cpu.h"
 #include "../clock/clock.h"
+#include "../memory/memory.h"
 
 void do_reset();
 void do_interrupt();
@@ -673,6 +674,7 @@ void do_cpu_cycle() {
 			break;
 		case DEC_R0:
 			do_dec(0);
+
 			registers.pc++;
 			break;
 		case DEC_R1:
@@ -686,6 +688,7 @@ void do_cpu_cycle() {
 		case DEC_R3:
 			do_dec(3);
 			registers.pc++;
+			 // printf("R3 = 0x%x\n", registers.r[3]);
 			break;
 		case DEC_ACC:
 			do_sub(1);
@@ -695,14 +698,14 @@ void do_cpu_cycle() {
 			switch (stage) {
 				case 0:
 					cpu_pins.rw = 0;
-					cpu_pins.data = registers.pc >> 8;
+					cpu_pins.data = (registers.pc + 3) >> 8;
 					registers.sp++;
 					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
 					break;
 				case 1:
 					cpu_pins.rw = 0;
-					cpu_pins.data = registers.pc;
+					cpu_pins.data = registers.pc + 3;
 					registers.sp++;
 					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
@@ -713,13 +716,14 @@ void do_cpu_cycle() {
 					stage++;
 					break;
 				case 3:
-					registers.pc = ((uint16_t) cpu_pins.data) << 8;
 					cpu_pins.rw = 1;
 					cpu_pins.address = registers.pc + 2;
+					registers.pc = ((uint16_t) cpu_pins.data) << 8;
 					stage++;
 					break;
 				case 4:
 					registers.pc |= cpu_pins.data;
+					// printf("JSR PC = 0x%x\n", registers.pc);
 					stage = 0;
 					break;
 			}
@@ -733,8 +737,9 @@ void do_cpu_cycle() {
 					stage++;
 					break;
 				case 1:
-					registers.pc = cpu_pins.data;
 					cpu_pins.rw = 1;
+					registers.pc = cpu_pins.data;
+					// printf("RET PC MSB = 0x%x\n\n", registers.pc);
 					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
@@ -742,7 +747,7 @@ void do_cpu_cycle() {
 				case 2:
 					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
 					stage = 0;
-					registers.pc++; // JSR has to push own address
+					// printf("RET PC = 0x%x\n\n", registers.pc);
 					break;
 			}
 			break;
@@ -804,8 +809,9 @@ void do_cpu_cycle() {
 					break;
 				case 2:
 					// Time for writing to stack
-					stage = 0;
 					registers.pc += 2;
+					// printf("PUSH STACK = 0x%x\n", global_memory[0x100 | registers.sp]);
+					stage = 0;
 					break;
 			}
 			break;
@@ -1455,7 +1461,7 @@ void do_store_ind_zp(uint8_t data) {
 		case 4:
 			stage = 0;
 			registers.pc += 2;
-			printf("R1 = 0x%x\n", registers.r[1]);
+			// printf("R1 = 0x%x\n", registers.r[1]);
 			break;
 	}
 }

@@ -1,7 +1,36 @@
-JSR		:MS				; 5
-JSR		:MS				; 5 ; second one breaks this (log PC for debug)
+:500MS
+JSR		:50MS
+JSR		:50MS
+JSR		:50MS
+JSR		:50MS
+JSR		:50MS
+JSR		:50MS
+JSR		:50MS
+JSR		:50MS
+JSR		:50MS
+JSR		:50MS
+RET
 
-NOP
+:50MS
+JSR		:5MS
+JSR		:5MS
+JSR		:5MS
+JSR		:5MS
+JSR		:5MS
+JSR		:5MS
+JSR		:5MS
+JSR		:5MS
+JSR		:5MS
+JSR		:5MS
+RET
+
+:5MS
+JSR		:MS
+JSR		:MS
+JSR		:MS
+JSR		:MS
+JSR		:MS
+RET
 
 :MS
 LOD		#249	R3		; 2
