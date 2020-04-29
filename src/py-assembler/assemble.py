@@ -265,6 +265,11 @@ mnemonics = {
 		"O": 0xf8,
 		"G": 0xf9,
 		"Z": 0xfa,
+	},
+
+	# temporary
+	"QUIT": {
+		"": 0xff,
 	}
 }
 

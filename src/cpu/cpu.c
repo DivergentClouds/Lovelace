@@ -1570,7 +1570,7 @@ void do_reset() {
 	registers.acc = 0;
 	registers.flags = 0;
 	registers.sp = 0;
-	registers.pc = 0x3FFF;
+	registers.pc = BANK_OFFSET;
 
 	cpu_pins.address = 0;
 	cpu_pins.data = 0;
@@ -1604,7 +1604,7 @@ void do_interrupt() {
 			break;
 		case 3:
 			stage = 0;
-			registers.pc = 0x3F00;
+			registers.pc = 0x7F00;
 			interrupting = 0;
 			break;
 	}

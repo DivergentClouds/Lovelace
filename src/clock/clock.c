@@ -9,9 +9,16 @@ void audio_callback(void *data, Uint8 *stream, int len) {
 	fstream = (float *) stream;
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++) {
 		for (int j = 0; j < 40; j++) {
+			clock_count++;
+			if (clock_count == 40000) {
+				cpu_pins.interrupt = 1;
+				clock_count = 0;
+				clock_interrupted = 1;
+			}
 			do_cpu_cycle();
 			do_controller_cycle();
 			do_audio_cycle();
+			cpu_pins.interrupt = 0;
 		}
 		generate_sample();
 		fstream[i] = audio_pins.out * 0.75;
@@ -46,6 +53,9 @@ int main(int argc, char const **argv) {
 	cpu_pins.reset = 1;
 	do_cpu_cycle();
 	cpu_pins.reset = 0;
+
+	memcpy(global_memory + 0x0200, preload_program, 0x7DFF);
+	memcpy(global_memory + 0x7F00, preload_ihandler, 0xFF);
 
 	// play audio
 

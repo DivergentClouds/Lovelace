@@ -4,19 +4,19 @@
 
 A text-based fantasy computer providing:
 
-- Virtual graphics, input, audio, memory, storage, and CPU hardware
+- Virtual graphics, input, audio, memory, storage, clock, and CPU hardware
  - Storage is virtual floppy disks
 - Bootloader ROM
 - A file system
 - An assembly language for that CPU
 - A programming language for that hardware and assembly language
  - Embedded assembly (?)
-- A bootstrap compiler for that language, written in Python
 - A basic disk operating system
+- A dialect of BASIC
 - Implementations of these tools
-- Various software running within the computer
- - Text editor
- - A compiler for the programming language, written in itself
+- Various software running within the computer (?)
+ - Text editor (?)
+ - An assembler written in itself
 
 ## Design ideals
 
