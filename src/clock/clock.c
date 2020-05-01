@@ -2,6 +2,7 @@
 #include "../audio/audio.h"
 #include "../memory/memory.h"
 #include "../cpu/cpu.h"
+#include "../keyboard/keyboard.h"
 
 void audio_callback(void *data, Uint8 *stream, int len) {
 	float *fstream;
@@ -45,6 +46,7 @@ const uint8_t scale[7] = {0, 2, 4, 5, 7, 9, 11};
 
 int main(int argc, char const **argv) {
 	SDL_AudioDeviceID dev;
+	SDL_Event event;
 
 	reset_registers();
 	reset_pins();
@@ -57,8 +59,6 @@ int main(int argc, char const **argv) {
 	memcpy(global_memory + 0x0200, preload_program, 0x7DFF);
 	memcpy(global_memory + 0x7F00, preload_ihandler, 0xFF);
 
-	// play audio
-
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return 1;
@@ -68,12 +68,16 @@ int main(int argc, char const **argv) {
 
 	SDL_PauseAudioDevice(dev, 0);
 
-	// generate audio
-
 	while (!should_close)
-		SDL_Delay(1);
-
-	// cleanup
+		while (SDL_PollEvent(&event)) {
+			switch (event.type) {
+				case SDL_KEYDOWN:
+				case SDL_KEYUP:
+					handle_keyboard_event();
+					break;
+			}
+			// handle keyboard and window events
+		}
 
 	SDL_CloseAudioDevice(dev);
 

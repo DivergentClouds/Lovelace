@@ -1,4 +1,4 @@
-; $7FFE = number of peripherals + 1 (number of banks)
+; $1FFE = number of peripherals + 1
 
 PSH R0
 PSH R1
@@ -6,17 +6,19 @@ PSH R2
 PSH R3
 PSH ACC
 
-LOD $7FFE R0
+LOD $1FFE R0
 
 :LOOP
 
-STR R0 $7FFF
-LOD $8000 R1
+STR R0 $1FFF
+LOD $2000 R1
 
 CMP R1 #0
 BRA Z :SKIP
 
 JSR $FF00
+
+STR #0 $2000
 
 :SKIP
 DEC R0
