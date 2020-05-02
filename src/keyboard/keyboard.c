@@ -3,7 +3,7 @@
 
 void handle_keyboard_event() {
 	const uint8_t *state = SDL_GetKeyboardState(NULL);
-
+	
 	key_states[0] = state[SDL_SCANCODE_LCTRL | SDL_SCANCODE_RCTRL];
 	key_states[1] = state[SDL_SCANCODE_LALT | SDL_SCANCODE_RALT];
 	key_states[2] = state[SDL_SCANCODE_LSHIFT | SDL_SCANCODE_RSHIFT];

@@ -59,7 +59,7 @@ int main(int argc, char const **argv) {
 	memcpy(global_memory + 0x0200, preload_program, 0x7DFF);
 	memcpy(global_memory + 0x7F00, preload_ihandler, 0xFF);
 
-	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
+	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) != 0) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return 1;
 	}
@@ -68,9 +68,19 @@ int main(int argc, char const **argv) {
 
 	SDL_PauseAudioDevice(dev, 0);
 
-	while (!should_close)
-		while (SDL_PollEvent(&event)) {
+	SDL_Window *screen = SDL_CreateWindow("My Game Window",
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+		800, 450,
+		SDL_WINDOW_OPENGL);
+
+	while (!should_close) {
+		if (SDL_PollEvent(&event)) {
+			// printf("polling...");
 			switch (event.type) {
+				case SDL_QUIT:
+					should_close = 1;
+					break;
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
 					handle_keyboard_event();
@@ -78,9 +88,10 @@ int main(int argc, char const **argv) {
 			}
 			// handle keyboard and window events
 		}
+	}
 
 	SDL_CloseAudioDevice(dev);
-
+	SDL_DestroyWindow(screen);
 	SDL_Quit();
 
 	return 0;

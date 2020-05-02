@@ -2,3 +2,4 @@
 #include "memory/memory.c"
 #include "audio/audio.c"
 #include "clock/clock.c"
+#include "keyboard/keyboard.c"

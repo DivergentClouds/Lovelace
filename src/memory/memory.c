@@ -57,41 +57,44 @@ void do_controller_cycle() {
 				else
 					keyboard_interrupted = cpu_pins.data;
 			} else if (cpu_pins.address - BANK_OFFSET - 1 < 57) {
-				if (cpu_pins.rw) // read
+				if (cpu_pins.rw) { // read
 					cpu_pins.data = key_states[cpu_pins.address - BANK_OFFSET];
-				else
+					// printf("R: %d\n", cpu_pins.data);
+				} else {
 					key_states[cpu_pins.address - BANK_OFFSET] = cpu_pins.data;
+					// printf("W: %d\n", cpu_pins.data);
+				}
 			}
 		} else if (bank == 2) {
 			// video card
 		} else if (bank == 3) {
 			// audio
 			switch (cpu_pins.address - BANK_OFFSET) {
-				case 0xFEFE:
+				case 1:
 					if (cpu_pins.rw) // read
 						cpu_pins.data = audio_pins.reset;
 					else
 						audio_pins.reset = cpu_pins.data & 1;
 					break;
-				case 0xFEFD:
+				case 2:
 					if (cpu_pins.rw) // read
 						cpu_pins.data = audio_pins.osc;
 					else
 						audio_pins.osc = cpu_pins.data;
 					break;
-				case 0xFEFC:
+				case 3:
 					if (cpu_pins.rw) // read
 						cpu_pins.data = audio_pins.reg;
 					else
 						audio_pins.reg = cpu_pins.data;
 					break;
-				case 0xFEFB:
+				case 4:
 					if (cpu_pins.rw) // read
 						cpu_pins.data = audio_pins.data;
 					else
 						audio_pins.data = cpu_pins.data;
 					break;
-				case 0xFEFA:
+				case 5:
 					if (cpu_pins.rw) // read
 						cpu_pins.data = audio_pins.rw;
 					else
