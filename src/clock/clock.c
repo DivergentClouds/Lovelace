@@ -72,7 +72,8 @@ int main(int argc, char const **argv) {
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		800, 450,
-		SDL_WINDOW_OPENGL);
+		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
+		| SDL_WINDOW_INPUT_FOCUS);
 
 	while (!should_close) {
 		if (SDL_PollEvent(&event)) {

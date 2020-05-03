@@ -554,235 +554,247 @@ JMP :label
 		- 0x99
 			- 1 cycle
 			- DEC acc
-- JSR \<adr>
-	- Pushes the PC to the stack and jumps to the given address.
-	- Opcodes:
-		- 0xa2
-			- 5 cycles
-			- JSR \<adr>
-- RET
-	- Pops an address off of the stack and jumps to it.
-	- Opcodes:
-		- 0xa3
-			- 3 cycles
-			- RET
-- RETI
-	- Pops an address off of the stack and jumps to it. Also pops the flags register.
-	- Opcodes:
-		- 0xa4
-			- 4 cycles
-			- RETI
 - PSH \<reg/acc/lit>
 	- Pushes a value to the stack. This increments the stack pointer.
 	- Opcodes:
-		- 0xad
+		- 0xa2
 			- 2 cycles
 			- PUSH r0
-		- 0xae
+		- 0xa3
 			- 2 cycles
 			- PUSH r1
-		- 0xaf
+		- 0xa4
 			- 2 cycles
 			- PUSH r2
-		- 0xb0
+		- 0xa5
 			- 2 cycles
 			- PUSH r3
-		- 0xb1
+		- 0xa6
 			- 2 cycles
 			- PUSH acc
-		- 0xb2
+		- 0xa7
 			- 3 cycles
 			- PUSH \<lit>
 - POP \<reg/acc>
 	- Pops a value from the stack. This decrements the stack pointer.
 	- Opcodes:
-		- 0xb3
+		- 0xa8
 			- 2 cycles
 			- POP r0
-		- 0xb4
+		- 0xa9
 			- 2 cycles
 			- POP r1
-		- 0xb5
+		- 0xaa
 			- 2 cycles
 			- POP r2
-		- 0xb6
+		- 0xab
 			- 2 cycles
 			- POP r3
-		- 0xb7
+		- 0xac
 			- 2 cycles
 			- POP acc
 - DRP
 	- Drops a value from the stack. This decrements the stack pointer.
 	- Opcodes:
-		- 0xb8
+		- 0xad
 			- 1 cycle
 			- DROP
 - CMP \<reg/acc> \<reg/acc/lit>
 	- Compares two values. The Z flag is set if they are equal, and the G flag is set if the first is greater than the second.
 	- Note that comparisons are unsigned.
 	- Opcodes:
-		- 0xc1
+		- 0xb6
 			- 1 cycle
 			- CMP r0 r1
-		- 0xc2
+		- 0xb7
 			- 1 cycle
 			- CMP r0 r2
-		- 0xc3
+		- 0xb8
 			- 1 cycle
 			- CMP r0 r3
-		- 0xc4
+		- 0xb9
 			- 1 cycle
 			- CMP r0 acc
-		- 0xc5
+		- 0xba
 			- 1 cycle
 			- CMP r1 r0
-		- 0xc6
+		- 0xbb
 			- 1 cycle
 			- CMP r1 r2
-		- 0xc7
+		- 0xbc
 			- 1 cycle
 			- CMP r1 r3
-		- 0xc8
+		- 0xbd
 			- 1 cycle
 			- CMP r1 acc
-		- 0xc9
+		- 0xbe
 			- 1 cycle
 			- CMP r2 r0
-		- 0xca
+		- 0xbf
 			- 1 cycle
 			- CMP r2 r1
-		- 0xcb
+		- 0xc0
 			- 1 cycle
 			- CMP r2 r3
-		- 0xcc
+		- 0xc1
 			- 1 cycle
 			- CMP r2 acc
-		- 0xcd
+		- 0xc2
 			- 1 cycle
 			- CMP r3 r0
-		- 0xce
+		- 0xc3
 			- 1 cycle
 			- CMP r3 r1
-		- 0xcf
+		- 0xc4
 			- 1 cycle
 			- CMP r3 r2
-		- 0xd0
+		- 0xc5
 			- 1 cycle
 			- CMP r3 acc
-		- 0xd1
+		- 0xc6
 			- 1 cycle
 			- CMP acc r0
-		- 0xd2
+		- 0xc7
 			- 1 cycle
 			- CMP acc r1
-		- 0xd3
+		- 0xc8
 			- 1 cycle
 			- CMP acc r2
-		- 0xd4
+		- 0xc9
 			- 1 cycle
 			- CMP acc r3
-		- 0xd5
+		- 0xca
 			- 2 cycles
 			- CMP r0 \<lit>
-		- 0xd6
+		- 0xcb
 			- 2 cycles
 			- CMP r1 \<lit>
-		- 0xd7
+		- 0xcc
 			- 2 cycles
 			- CMP r2 \<lit>
-		- 0xd8
+		- 0xcd
 			- 2 cycles
 			- CMP r3 \<lit>
-		- 0xd9
+		- 0xce
 			- 2 cycles
 			- CMP acc \<lit>
 - BRA \<flg> \<adr>
 	- Acts like a JMP conditional on the flag being set.
 	- Opcodes:
-		- 0xda
+		- 0xcf
 			- 3 cycles if jump, 1 otherwise
 			- BRA S
-		- 0xdb
+		- 0xd0
 			- 3 cycles if jump, 1 otherwise
 			- BRA C
-		- 0xdc
+		- 0xd1
 			- 3 cycles if jump, 1 otherwise
 			- BRA I
-		- 0xdd
+		- 0xd2
 			- 3 cycles if jump, 1 otherwise
 			- BRA O
-		- 0xde
+		- 0xd3
 			- 3 cycles if jump, 1 otherwise
 			- BRA G
-		- 0xdf
+		- 0xd4
 			- 3 cycles if jump, 1 otherwise
 			- BRA Z
 - BRAN \<flg> \<adr>
 	- Acts like a JMP conditional on the flag being clear.
 	- Opcodes:
-		- 0xe0
+		- 0xd5
 			- 3 cycles if jump, 1 otherwise
 			- BRAN S
-		- 0xe1
+		- 0xd6
 			- 3 cycles if jump, 1 otherwise
 			- BRAN C
-		- 0xe2
+		- 0xd7
 			- 3 cycles if jump, 1 otherwise
 			- BRAN I
-		- 0xe3
+		- 0xd8
 			- 3 cycles if jump, 1 otherwise
 			- BRAN O
-		- 0xe4
+		- 0xd9
 			- 3 cycles if jump, 1 otherwise
 			- BRAN G
-		- 0xe5
+		- 0xda
 			- 3 cycles if jump, 1 otherwise
 			- BRAN Z
 - JMP \<adr>
 	- Sets the program counter to the address.
 	- Opcodes:
-		- 0xe6
+		- 0xdb
 			- 3 cycles
 			- JMP \<adr>
+- JMPI \<adr>
+	- Jumps to address pointed to by given address.
+	- Opcodes:
+		- 0xdc
+			- 3 cycles
+			- JMP \<adr>
+- JSR \<adr>
+	- Pushes the PC to the stack and jumps to the given address.
+	- Opcodes:
+		- 0xdd
+			- 5 cycles
+			- JSR \<adr>
+- JSRI \<adr>
+	- Pushes the PC to the stack and jumps to the address pointed to by the given address.
+	- Opcodes:
+		- 0xde
+			- 7 cycles
+			- JSRI \<adr>
+- RET
+	- Pops an address off of the stack and jumps to it.
+	- Opcodes:
+		- 0xdf
+			- 3 cycles
+			- RET
+- RETI
+	- Pops an address off of the stack and jumps to it. Also pops the flags register.
+	- Opcodes:
+		- 0xe0
+			- 4 cycles
+			- RETI
 - SET \<flg>
 	- Sets a given flag.
 	- Opcodes:
-		- 0xef
+		- 0xe9
 			- 1 cycle
 			- SET S
-		- 0xf0
+		- 0xea
 			- 1 cycle
 			- SET C
-		- 0xf1
+		- 0xeb
 			- 1 cycle
 			- SET I
-		- 0xf2
+		- 0xec
 			- 1 cycle
 			- SET O
-		- 0xf3
+		- 0xed
 			- 1 cycle
 			- SET G
-		- 0xf4
+		- 0xee
 			- 1 cycle
 			- SET Z
 - CLR \<flg>
 	- Clears a given flag.
 	- Opcodes:
-		- 0xf5
+		- 0xef
 			- 1 cycle
 			- CLR S
-		- 0xf6
+		- 0xf0
 			- 1 cycle
 			- CLR C
-		- 0xf7
+		- 0xf1
 			- 1 cycle
 			- CLR I
-		- 0xf8
+		- 0xf2
 			- 1 cycle
 			- CLR O
-		- 0xf9
+		- 0xf3
 			- 1 cycle
 			- CLR G
-		- 0xfa
+		- 0xf4
 			- 1 cycle
 			- CLR Z

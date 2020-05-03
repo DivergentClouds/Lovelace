@@ -177,94 +177,100 @@ mnemonics = {
 		"R3": 0x98,
 		"LIT": 0x99,
 	},
-	"JSR": {
-		"ADR": 0xa2,
-	},
-	"RET": {
-		"": 0xa3,
-	},
-	"RETI": {
-		"": 0xa4,
-	},
 	"PSH": {
-		"R0": 0xad,
-		"R1": 0xae,
-		"R2": 0xaf,
-		"R3": 0xb0,
-		"ACC": 0xb1,
-		"LIT": 0xb2,
+		"R0": 0xa2,
+		"R1": 0xa3,
+		"R2": 0xa4,
+		"R3": 0xa5,
+		"ACC": 0xa6,
+		"LIT": 0xa7,
 	},
 	"POP": {
-		"R0": 0xb3,
-		"R1": 0xb4,
-		"R2": 0xb5,
-		"R3": 0xb6,
-		"ACC": 0xb7,
+		"R0": 0xa8,
+		"R1": 0xa9,
+		"R2": 0xaa,
+		"R3": 0xab,
+		"ACC": 0xac,
 	},
 	"DRP": {
-		"": 0xb8,
+		"": 0xad,
 	},
 	"CMP": {
-		"R0 R1": 0xc1,
-		"R0 R2": 0xc2,
-		"R0 R3": 0xc3,
-		"R0 ACC": 0xc4,
-		"R1 R0": 0xc5,
-		"R1 R2": 0xc6,
-		"R1 R3": 0xc7,
-		"R1 ACC": 0xc8,
-		"R2 R0": 0xc9,
-		"R2 R1": 0xca,
-		"R2 R3": 0xcb,
-		"R2 ACC": 0xcc,
-		"R3 R0": 0xcd,
-		"R3 R1": 0xce,
-		"R3 R2": 0xcf,
-		"R3 ACC": 0xd0,
-		"ACC R0": 0xd1,
-		"ACC R1": 0xd2,
-		"ACC R2": 0xd3,
-		"ACC R3": 0xd4,
-		"R0 LIT": 0xd5,
-		"R1 LIT": 0xd6,
-		"R2 LIT": 0xd7,
-		"R3 LIT": 0xd8,
-		"ACC LIT": 0xd9,
+		"R0 R1": 0xb6,
+		"R0 R2": 0xb7,
+		"R0 R3": 0xb8,
+		"R0 ACC": 0xb9,
+		"R1 R0": 0xba,
+		"R1 R2": 0xbb,
+		"R1 R3": 0xbc,
+		"R1 ACC": 0xbd,
+		"R2 R0": 0xbe,
+		"R2 R1": 0xbf,
+		"R2 R3": 0xc0,
+		"R2 ACC": 0xc1,
+		"R3 R0": 0xc2,
+		"R3 R1": 0xc3,
+		"R3 R2": 0xc4,
+		"R3 ACC": 0xc5,
+		"ACC R0": 0xc6,
+		"ACC R1": 0xc7,
+		"ACC R2": 0xc8,
+		"ACC R3": 0xc9,
+		"R0 LIT": 0xca,
+		"R1 LIT": 0xcb,
+		"R2 LIT": 0xcc,
+		"R3 LIT": 0xcd,
+		"ACC LIT": 0xce,
 	},
 	"BRA": {
-		"S ADR": 0xda,
-		"C ADR": 0xdb,
-		"I ADR": 0xdc,
-		"O ADR": 0xdd,
-		"G ADR": 0xde,
-		"Z ADR": 0xdf,
+		"S ADR": 0xcf,
+		"C ADR": 0xd0,
+		"I ADR": 0xd1,
+		"O ADR": 0xd2,
+		"G ADR": 0xd3,
+		"Z ADR": 0xd4,
 	},
 	"BRAN": {
-		"S ADR": 0xe0,
-		"C ADR": 0xe1,
-		"I ADR": 0xe2,
-		"O ADR": 0xe3,
-		"G ADR": 0xe4,
-		"Z ADR": 0xe5,
+		"S ADR": 0xd5,
+		"C ADR": 0xd6,
+		"I ADR": 0xd7,
+		"O ADR": 0xd8,
+		"G ADR": 0xd9,
+		"Z ADR": 0xda,
 	},
 	"JMP": {
-		"ADR": 0xe6,
+		"ADR": 0xdb,
+	},
+	"JMPI": {
+		"ADR": 0xdc,
+	},
+	"JSR": {
+		"ADR": 0xdd,
+	},
+	"JSRI": {
+		"ADR": 0xde,
+	},
+	"RET": {
+		"": 0xdf,
+	},
+	"RETI": {
+		"": 0xe0,
 	},
 	"SET": {
+		"S": 0xe9,
+		"C": 0xea,
+		"I": 0xeb,
+		"O": 0xec,
+		"G": 0xed,
+		"Z": 0xee,
+	},
+	"CLR": {
 		"S": 0xef,
 		"C": 0xf0,
 		"I": 0xf1,
 		"O": 0xf2,
 		"G": 0xf3,
 		"Z": 0xf4,
-	},
-	"CLR": {
-		"S": 0xf5,
-		"C": 0xf6,
-		"I": 0xf7,
-		"O": 0xf8,
-		"G": 0xf9,
-		"Z": 0xfa,
 	},
 
 	# temporary
@@ -316,6 +322,7 @@ def compile(source, location=0x0200):
 	labels = {}
 	instructions = []
 	length = 0
+	constants = {}
 
 	for line in source.split("\n"):
 		parts = line.strip().upper().split(";")[0].split()
@@ -326,7 +333,15 @@ def compile(source, location=0x0200):
 		if parts[0].startswith(":"):
 			assert len(parts) == 1, "Whitespace isn't allowed in label names"
 			labels[parts[0][1:]] = length + location
+		elif parts[0].startswith("DEF"):
+			constants[parts[1]] = parts[2]
 		else:
+			if parts[0] == "|":
+				instructions.append(parts)
+				length += sum(map(argument_size,
+					map(partial(interpret_argument, instruction=parts[0]), parts[1:])))
+				continue
+
 			assert parts[0] in mnemonics, "Unrecognized mnemonic"
 			instructions.append(parts)
 
@@ -336,10 +351,14 @@ def compile(source, location=0x0200):
 	for instruction in instructions:
 		print(instruction)
 
-		yield mnemonics[instruction[0]][
-			" ".join(map(partial(interpret_argument, instruction=instruction[0]), instruction[1:]))]
+		if (instruction[0] != "|"):
+			yield mnemonics[instruction[0]][
+				" ".join(map(partial(interpret_argument,
+					instruction=instruction[0]), instruction[1:]))]
 
 		for arg in instruction[1:]:
+			if arg in constants:
+				arg = constants[arg]
 			type = interpret_argument(arg, instruction[0])
 			if type == "ADR":
 				if arg[0] == ":":
