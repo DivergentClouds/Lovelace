@@ -77,20 +77,19 @@ int main(int argc, char const **argv) {
 
 	while (!should_close) {
 		if (SDL_PollEvent(&event)) {
-			// printf("polling...");
 			switch (event.type) {
 				case SDL_QUIT:
 					should_close = 1;
 					break;
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
-					handle_keyboard_event();
+					handle_keyboard_event(event);
 					break;
 			}
 			// handle keyboard and window events
 		}
 	}
-
+	
 	SDL_CloseAudioDevice(dev);
 	SDL_DestroyWindow(screen);
 	SDL_Quit();

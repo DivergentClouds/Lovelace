@@ -6,7 +6,7 @@
 uint8_t key_states[57];
 uint8_t keyboard_interrupted = 0;
 
-void handle_keyboard_event();
+void handle_keyboard_event(SDL_Event event);
 
 
 #endif
