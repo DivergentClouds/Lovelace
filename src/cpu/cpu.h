@@ -26,9 +26,10 @@ cpu_pins_t cpu_pins;
 // states
 
 uint8_t instruction;
-uint8_t stage;
+uint8_t stage = 0;
 uint8_t temp[2]; // for load and store
-uint8_t interrupting;
+uint8_t interrupting = 0; // should an interrupt happen
+uint8_t mid_interrupt = 0; // for checking if an interrupt is in progress
 
 // misc functions
 

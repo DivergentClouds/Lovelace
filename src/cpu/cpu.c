@@ -15,10 +15,11 @@ void do_cpu_cycle() {
 		}
 	}
 
-	if (interrupting) {
+    printf("interrupting %d, stage: %d\n", interrupting, stage);
+
+	if (interrupting && (stage == 0 || mid_interrupt)) {
 		do_interrupt();
 		return;
-		// if (interrupting) return;
 	} else {
 		printf("instruction: %x\n", instruction);
 		printf("program counter: %x\n", registers.pc);
@@ -1589,6 +1590,7 @@ void do_reset() {
 void do_interrupt() {
 	switch (stage) {
 		case 0:
+			mid_interrupt = 1;
 			cpu_pins.rw = 0;
 			registers.sp++;
 			cpu_pins.address = 0x100 | registers.sp;
@@ -1610,9 +1612,10 @@ void do_interrupt() {
 			stage++;
 			break;
 		case 3:
-			stage = 0;
-			registers.pc = 0x7F00;
+			registers.pc = 0x7F00 - 1;
 			interrupting = 0;
+			mid_interrupt = 0;
+			stage = 0;
 			break;
 	}
 }

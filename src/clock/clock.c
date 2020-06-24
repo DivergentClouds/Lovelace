@@ -57,8 +57,6 @@ int main(int argc, char const **argv) {
 	memcpy(global_memory + 0x0200, preload_program, 0x7DFF);
 	memcpy(global_memory + 0x7F00, preload_ihandler, 0xFE);
 
-	printf("0x%x",global_memory[0x7F00]);
-
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) != 0) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return 1;
