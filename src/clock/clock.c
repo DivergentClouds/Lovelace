@@ -17,7 +17,7 @@ void audio_callback(void *data, Uint8 *stream, int len) {
 				clock_interrupted = 1;
 			}
 			do_cpu_cycle();
-			do_controller_cycle();
+			do_controller_cycle(); // memory controller
 			do_audio_cycle();
 			cpu_pins.interrupt = 0;
 		}
@@ -42,15 +42,13 @@ SDL_AudioDeviceID initialise_audio() {
 	return dev;
 }
 
-const uint8_t scale[7] = {0, 2, 4, 5, 7, 9, 11};
-
 int main(int argc, char const **argv) {
 	SDL_AudioDeviceID dev;
 	SDL_Event event;
 
 	reset_registers();
 	reset_pins();
-	srand(0x7EA75);
+	srand(0xBEADED);
 
 	cpu_pins.reset = 1;
 	do_cpu_cycle();
@@ -58,6 +56,8 @@ int main(int argc, char const **argv) {
 
 	memcpy(global_memory + 0x0200, preload_program, 0x7DFF);
 	memcpy(global_memory + 0x7F00, preload_ihandler, 0xFE);
+
+	printf("0x%x",global_memory[0x7F00]);
 
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) != 0) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -68,31 +68,43 @@ int main(int argc, char const **argv) {
 
 	SDL_PauseAudioDevice(dev, 0);
 
-	SDL_Window *screen = SDL_CreateWindow("My Game Window",
+	SDL_Window *screen = SDL_CreateWindow("Harriet",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		800, 450,
 		SDL_WINDOW_RESIZABLE
 		| SDL_WINDOW_INPUT_FOCUS);
 
+	SDL_Surface* screenSurface = SDL_GetWindowSurface(screen);
+
 	while (!should_close) {
+		// to prevent cpu eating
+		SDL_FillRect(screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0x00, 0x00, 0x00));
+		SDL_UpdateWindowSurface(screen);
+
 		if (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT:
+					printf("quitting\n"); // debug
 					should_close = 1;
 					break;
 				case SDL_KEYDOWN:
+					printf("keydown\n");
 				case SDL_KEYUP:
 					handle_keyboard_event(event);
+					if (event.type == SDL_KEYUP) {
+						printf("keyup\n");
+					}
 					break;
 			}
 			// handle keyboard and window events
 		}
 	}
-	
+
 	SDL_CloseAudioDevice(dev);
 	SDL_DestroyWindow(screen);
 	SDL_Quit();
+	printf("%d \n", should_close); // debug
 
 	return 0;
 }

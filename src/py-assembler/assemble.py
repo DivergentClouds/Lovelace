@@ -387,5 +387,6 @@ if __name__ == "__main__":
 
 	code = bytes(compile(source, args.offset))
 
+	print("\n0x" + ", 0x".join(code.hex()[i:i+2] for i in range(0, len(code.hex()), 2)))
 	with open(args.output, "wb") as f:
 		f.write(code)

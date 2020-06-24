@@ -25,5 +25,5 @@ JMP		:LOOP
 
 :OFF
 STR		#3 		$1FFF 	; switch to audio bank
-STR		#0		$2004	; set volume to 64
+STR		#0		$2004	; set volume to 0
 JMP		:LOOP

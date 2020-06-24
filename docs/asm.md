@@ -100,7 +100,7 @@ JMP :label
 			- STR acc \<adr>
 		- 0x0E
 			- 4 cycles
-			- STR lit \<adr>
+			- STR \<lit> \<adr>
 		- 0x0F
 			- 3 cycles
 			- STR r0 \<zp>
@@ -118,7 +118,7 @@ JMP :label
 			- STR acc \<zp>
 		- 0x14
 			- 3 cycles
-			- STR lit \<zp>
+			- STR \<lit> \<zp>
 - STRI \<reg/acc/lit> \<adr/zp>
 	- Stores data from source operand to address pointed to by destination address
 	- Opcodes:

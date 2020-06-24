@@ -65,6 +65,8 @@ void do_bra(uint8_t mask);
 void do_bran(uint8_t mask);
 void do_compare_lit(uint8_t data);
 
+void do_reset();
+void do_interrupt();
 
 // opcodes
 

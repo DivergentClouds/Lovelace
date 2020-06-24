@@ -2,9 +2,6 @@
 #include "../clock/clock.h"
 #include "../memory/memory.h"
 
-void do_reset();
-void do_interrupt();
-
 void do_cpu_cycle() {
 	if (stage == 0) {
 		if (cpu_pins.reset) {
@@ -20,9 +17,13 @@ void do_cpu_cycle() {
 
 	if (interrupting) {
 		do_interrupt();
+		return;
+		// if (interrupting) return;
+	} else {
+		printf("instruction: %x\n", instruction);
+		printf("program counter: %x\n", registers.pc);
 
-		if (interrupting) return;
-	} else switch (instruction) {
+		switch (instruction) {
 		case STORE_IND_R0:
 			do_store_ind(registers.r[0]);
 			break;
@@ -756,6 +757,7 @@ void do_cpu_cycle() {
 				case 0:
 					cpu_pins.rw = 1;
 					cpu_pins.address = 0x100 | registers.sp;
+					printf("sp = 0x%x", registers.sp);
 					registers.sp--;
 					stage++;
 					break;
@@ -981,6 +983,7 @@ void do_cpu_cycle() {
 				case 2:
 					registers.pc |= cpu_pins.data;
 					stage = 0;
+					// printf("0x%x\n",registers.pc);
 					break;
 			}
 			break;
@@ -1033,11 +1036,15 @@ void do_cpu_cycle() {
 			registers.pc++;
 			break;
 		case 0xFF: // not for final release
+			// printf("pc = 0x%x\n", registers.pc); // debug
+			// printf("address = 0x%x\n", cpu_pins.address); // debug
+			// printf("data = 0x%x\n", cpu_pins.data);
 			should_close = 1;
 			stage = 1;
 			break;
 		default:
 			registers.pc++;
+		}
 	}
 
 	if (stage == 0) {
@@ -1372,7 +1379,7 @@ void do_store(uint8_t data) {
 			break;
 		case 3:
 			stage = 0;
-			registers.pc += 2;
+			registers.pc += 3;
 			break;
 	}
 }
@@ -1570,7 +1577,7 @@ void do_reset() {
 	registers.acc = 0;
 	registers.flags = 0;
 	registers.sp = 0;
-	registers.pc = BANK_OFFSET;
+	registers.pc = BANK_OFFSET - 1; // -1 is debug
 
 	cpu_pins.address = 0;
 	cpu_pins.data = 0;

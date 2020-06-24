@@ -1,0 +1,2 @@
+:LOOP
+JMP		:LOOP
