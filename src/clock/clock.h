@@ -7,12 +7,11 @@
 #include <string.h>
 
 #define SAMPLE_RATE 50000
-#define CYCLE_LIMIT 25000
-#define AUDIO_BUFFER_SIZE 8192
+#define AUDIO_BUFFER_SIZE 4096
+#define PC_START 0x200
 
 uint8_t should_close = 0;
 uint16_t clock_count = 0;
-uint32_t cycle_count = 0;
 
 uint8_t clock_interrupted = 0;
 

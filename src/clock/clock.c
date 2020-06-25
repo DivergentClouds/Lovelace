@@ -12,7 +12,7 @@ void audio_callback(void *data, Uint8 *stream, int len) {
 		for (int j = 0; j < 40; j++) {
 			clock_count++;
 			if (clock_count == 40000) {
-				cpu_pins.interrupt = 1;
+				// cpu_pins.interrupt = 1;
 				clock_count = 0;
 				clock_interrupted = 1;
 			}
@@ -54,8 +54,8 @@ int main(int argc, char const **argv) {
 	do_cpu_cycle();
 	cpu_pins.reset = 0;
 
-	memcpy(global_memory + 0x0200, preload_program, 0x7DFF);
-	memcpy(global_memory + 0x7F00, preload_ihandler, 0xFE);
+	memcpy(global_memory + PC_START, preload_program, 0x7DFF);
+	memcpy(global_memory + INT_OFFSET, preload_ihandler, 0xFE);
 
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) != 0) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -76,7 +76,7 @@ int main(int argc, char const **argv) {
 	SDL_Surface* screenSurface = SDL_GetWindowSurface(screen);
 
 	while (!should_close) {
-		// to prevent cpu eating
+		// to prevent cpu eating (not working very well)
 		SDL_FillRect(screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0x00, 0x00, 0x00));
 		SDL_UpdateWindowSurface(screen);
 
@@ -87,11 +87,9 @@ int main(int argc, char const **argv) {
 					should_close = 1;
 					break;
 				case SDL_KEYDOWN:
-					printf("keydown\n");
 				case SDL_KEYUP:
 					handle_keyboard_event(event);
 					if (event.type == SDL_KEYUP) {
-						printf("keyup\n");
 					}
 					break;
 			}

@@ -15,14 +15,14 @@ void do_cpu_cycle() {
 		}
 	}
 
-    printf("interrupting %d, stage: %d\n", interrupting, stage);
+    // printf("interrupting %d, stage: %d\n", interrupting, stage);
 
 	if (interrupting && (stage == 0 || mid_interrupt)) {
 		do_interrupt();
 		return;
 	} else {
-		printf("instruction: %x\n", instruction);
-		printf("program counter: %x\n", registers.pc);
+		// printf("instruction: %x\n", instruction);
+		// printf("program counter: %x\n", registers.pc);
 
 		switch (instruction) {
 		case STORE_IND_R0:
@@ -690,7 +690,7 @@ void do_cpu_cycle() {
 		case DEC_R3:
 			do_dec(3);
 			registers.pc++;
-			 // printf("R3 = 0x%x\n", registers.r[3]);
+			 // // printf("R3 = 0x%x\n", registers.r[3]);
 			break;
 		case DEC_ACC:
 			do_sub(1);
@@ -725,7 +725,7 @@ void do_cpu_cycle() {
 					break;
 				case 4:
 					registers.pc |= cpu_pins.data;
-					// printf("JSR PC = 0x%x\n", registers.pc);
+					// // printf("JSR PC = 0x%x\n", registers.pc);
 					stage = 0;
 					break;
 			}
@@ -741,7 +741,7 @@ void do_cpu_cycle() {
 				case 1:
 					cpu_pins.rw = 1;
 					registers.pc = cpu_pins.data;
-					// printf("RET PC MSB = 0x%x\n\n", registers.pc);
+					// // printf("RET PC MSB = 0x%x\n\n", registers.pc);
 					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
@@ -749,7 +749,7 @@ void do_cpu_cycle() {
 				case 2:
 					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
 					stage = 0;
-					// printf("RET PC = 0x%x\n\n", registers.pc);
+					// // printf("RET PC = 0x%x\n\n", registers.pc);
 					break;
 			}
 			break;
@@ -758,7 +758,7 @@ void do_cpu_cycle() {
 				case 0:
 					cpu_pins.rw = 1;
 					cpu_pins.address = 0x100 | registers.sp;
-					printf("sp = 0x%x", registers.sp);
+					// printf("sp = 0x%x", registers.sp);
 					registers.sp--;
 					stage++;
 					break;
@@ -813,7 +813,7 @@ void do_cpu_cycle() {
 				case 2:
 					// Time for writing to stack
 					registers.pc += 2;
-					// printf("PUSH STACK = 0x%x\n", global_memory[0x100 | registers.sp]);
+					// // printf("PUSH STACK = 0x%x\n", global_memory[0x100 | registers.sp]);
 					stage = 0;
 					break;
 			}
@@ -984,7 +984,7 @@ void do_cpu_cycle() {
 				case 2:
 					registers.pc |= cpu_pins.data;
 					stage = 0;
-					// printf("0x%x\n",registers.pc);
+					// // printf("0x%x\n",registers.pc);
 					break;
 			}
 			break;
@@ -1037,9 +1037,9 @@ void do_cpu_cycle() {
 			registers.pc++;
 			break;
 		case 0xFF: // not for final release
-			// printf("pc = 0x%x\n", registers.pc); // debug
-			// printf("address = 0x%x\n", cpu_pins.address); // debug
-			// printf("data = 0x%x\n", cpu_pins.data);
+			// // printf("pc = 0x%x\n", registers.pc); // debug
+			// // printf("address = 0x%x\n", cpu_pins.address); // debug
+			// // printf("data = 0x%x\n", cpu_pins.data);
 			should_close = 1;
 			stage = 1;
 			break;
@@ -1052,10 +1052,10 @@ void do_cpu_cycle() {
 		cpu_pins.rw = 1;
 		cpu_pins.address = registers.pc;
 
-		// printf("\nPC = 0x%x\n", registers.pc);
-		// printf("OP = 0x%x\n", instruction);
-		// printf("R0 = 0x%x\n", registers.r[0]);
-		// printf("R1 = 0x%x\n", registers.r[1]);
+		// // printf("\nPC = 0x%x\n", registers.pc);
+		// // printf("OP = 0x%x\n", instruction);
+		// // printf("R0 = 0x%x\n", registers.r[0]);
+		// // printf("R1 = 0x%x\n", registers.r[1]);
 	}
 }
 
@@ -1342,7 +1342,7 @@ void do_load_ind_zp(uint8_t *data) {
 		case 2:
 			cpu_pins.rw = 1;
 			temp[0] = cpu_pins.data;
-			//printf("temp[0] = 0x%x\n", temp[0]);
+			//// printf("temp[0] = 0x%x\n", temp[0]);
 			cpu_pins.address++;
 			stage++;
 			break;
@@ -1469,7 +1469,7 @@ void do_store_ind_zp(uint8_t data) {
 		case 4:
 			stage = 0;
 			registers.pc += 2;
-			// printf("R1 = 0x%x\n", registers.r[1]);
+			// // printf("R1 = 0x%x\n", registers.r[1]);
 			break;
 	}
 }
@@ -1612,7 +1612,7 @@ void do_interrupt() {
 			stage++;
 			break;
 		case 3:
-			registers.pc = 0x7F00 - 1;
+			registers.pc = 0x7F00;
 			interrupting = 0;
 			mid_interrupt = 0;
 			stage = 0;
