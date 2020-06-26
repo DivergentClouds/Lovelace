@@ -7,7 +7,7 @@
 #include <string.h>
 
 #define SAMPLE_RATE 50000
-#define AUDIO_BUFFER_SIZE 4096
+#define AUDIO_BUFFER_SIZE 10000
 #define PC_START 0x200
 
 uint8_t should_close = 0;

@@ -9,7 +9,7 @@ void audio_callback(void *data, Uint8 *stream, int len) {
 
 	fstream = (float *) stream;
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++) {
-		for (int j = 0; j < 40; j++) {
+		for (int j = 0; j < 10; j++) {
 			clock_count++;
 			if (clock_count == 40000) {
 				// cpu_pins.interrupt = 1;
@@ -89,8 +89,6 @@ int main(int argc, char const **argv) {
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
 					handle_keyboard_event(event);
-					if (event.type == SDL_KEYUP) {
-					}
 					break;
 			}
 			// handle keyboard and window events

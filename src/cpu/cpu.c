@@ -8,7 +8,7 @@ void do_cpu_cycle() {
 			do_reset();
 
 			return;
-		} else if (cpu_pins.interrupt && !(registers.flags & 0b00100000)) {
+		} else if ((cpu_pins.interrupt && !(registers.flags & 0b00100000)) || mid_interrupt) {
 			interrupting = 1;
 		} else {
 			instruction = cpu_pins.data;
