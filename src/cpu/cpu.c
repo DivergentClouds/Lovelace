@@ -1,5 +1,5 @@
 #include "cpu.h"
-#include "../clock/clock.h"
+#include "../motherboard/motherboard.h"
 #include "../memory/memory.h"
 
 void do_cpu_cycle() {

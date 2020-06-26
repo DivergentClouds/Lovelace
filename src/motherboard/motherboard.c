@@ -1,4 +1,4 @@
-#include "clock.h"
+#include "motherboard.h"
 #include "../audio/audio.h"
 #include "../memory/memory.h"
 #include "../cpu/cpu.h"

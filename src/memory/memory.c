@@ -1,7 +1,7 @@
 #include "memory.h"
 #include "../cpu/cpu.h"
 #include "../audio/audio.h"
-#include "../clock/clock.h"
+#include "../motherboard/motherboard.h"
 #include "../keyboard/keyboard.h"
 
 void do_controller_cycle() {

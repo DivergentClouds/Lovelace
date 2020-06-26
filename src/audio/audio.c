@@ -1,5 +1,5 @@
 #include "audio.h"
-#include "../clock/clock.h"
+#include "../motherboard/motherboard.h"
 
 // registers
 
