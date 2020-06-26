@@ -984,7 +984,7 @@ void do_cpu_cycle() {
 				case 2:
 					registers.pc |= cpu_pins.data;
 					stage = 0;
-					// // printf("0x%x\n",registers.pc);
+					// printf("0x%x\n",registers.pc);
 					break;
 			}
 			break;
