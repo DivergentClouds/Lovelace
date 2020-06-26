@@ -45,6 +45,13 @@ int main(int argc, char const **argv) {
 	SDL_AudioDeviceID dev;
 	SDL_Event event;
 
+	fcMutex = SDL_CreateMutex();
+	if (!fcMutex) {
+		fprintf(stderr, "Couldn't create mutex: %s\n", SDL_GetError());
+		should_close = 1;
+	}
+
+
 	reset_registers();
 	reset_pins();
 	srand(0xBEADED);
@@ -81,7 +88,7 @@ int main(int argc, char const **argv) {
 		if (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_QUIT:
-					printf("quitting\n"); // debug
+					printf("Quitting Properly\n"); // debug
 					should_close = 1;
 					break;
 				case SDL_KEYDOWN:
@@ -94,10 +101,13 @@ int main(int argc, char const **argv) {
 		SDL_Delay(10);
 	}
 
+	SDL_UnlockMutex(fcMutex);
+	SDL_DestroyMutex(fcMutex);
 	SDL_CloseAudioDevice(dev);
 	SDL_DestroyWindow(screen);
 	SDL_Quit();
-	printf("%d \n", should_close); // debug
+
+	printf("1 if closed successfully: %d \n", should_close); // debug
 
 	return 0;
 }

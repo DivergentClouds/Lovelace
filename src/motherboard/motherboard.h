@@ -1,5 +1,5 @@
-#ifndef CLOCK_H
-#define CLOCK_H
+#ifndef MOTHERBOARD_H
+#define MOTHERBOARD_H
 
 #include <inttypes.h>
 #include <SDL2/SDL.h>
@@ -14,6 +14,9 @@
 #define CYCLES_PER_CALLBACK (CPU_SIM_FREQ / CPU_UPDATE_FREQ)
 
 #define PC_START 0x200
+
+SDL_mutex *fcMutex; //probably change name later
+int fcMutexStatus;
 
 uint8_t should_close = 0;
 uint16_t clock_count = 0;

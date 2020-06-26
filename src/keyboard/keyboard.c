@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include "../motherboard/motherboard.h"
 #include "../cpu/cpu.h"
 
 void handle_keyboard_event(SDL_Event event) {
@@ -72,6 +73,12 @@ void handle_keyboard_event(SDL_Event event) {
 	key_states[55] = event.key.keysym.sym == SDLK_LEFTBRACKET && event.key.state == SDL_PRESSED;
 	key_states[56] = event.key.keysym.sym == SDLK_RIGHTBRACKET && event.key.state == SDL_PRESSED;
 
-	keyboard_interrupted = 1;
-	cpu_pins.interrupt = 1;
+	if (SDL_LockMutex(fcMutex) == 0) {
+		keyboard_interrupted = 1;
+		cpu_pins.interrupt = 1;
+		SDL_UnlockMutex(fcMutex);
+	} else {
+		printf("Failed to lock fcMutex in keyboard.c: %s\n", SDL_GetError());
+		should_close = 1;
+	}
 }

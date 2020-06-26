@@ -3,13 +3,23 @@
 #include "../memory/memory.h"
 
 void do_cpu_cycle() {
+
 	if (stage == 0) {
 		if (cpu_pins.reset) {
 			do_reset();
 
 			return;
 		} else if ((cpu_pins.interrupt && !(registers.flags & 0b00100000)) || mid_interrupt) {
-			interrupting = 1;
+			fcMutexStatus = SDL_TryLockMutex(fcMutex);
+			if (fcMutexStatus == 0) {
+				interrupting = 1;
+			} else if (fcMutexStatus == SDL_MUTEX_TIMEDOUT) {
+
+			} else {
+				printf("Failed to lock fcMutex in cpu.c: %s\n", SDL_GetError());
+				should_close = 1;
+			}
+			SDL_UnlockMutex(fcMutex);
 		} else {
 			instruction = cpu_pins.data;
 		}
@@ -1037,9 +1047,11 @@ void do_cpu_cycle() {
 			registers.pc++;
 			break;
 		case 0xFF: // not for final release
-			// // printf("pc = 0x%x\n", registers.pc); // debug
-			// // printf("address = 0x%x\n", cpu_pins.address); // debug
-			// // printf("data = 0x%x\n", cpu_pins.data);
+			if (should_close == 0) {
+				printf("pc = 0x%x\n", registers.pc); // debug
+				printf("address = 0x%x\n", cpu_pins.address); // debug
+				printf("data = 0x%x\n", cpu_pins.data);
+			}
 			should_close = 1;
 			stage = 1;
 			break;
