@@ -6,7 +6,7 @@ linux:
 	gcc -c ./src/audio/audio.c -o ./build/audio.o
 	gcc -c ./src/keyboard/keyboard.c -o ./build/keyboard.o
 	gcc ./build/motherboard.o ./build/cpu.o ./build/memory.o ./build/audio.o ./build/keyboard.o -lm -lSDL2 -O2 -o ./build/harriet
-mingw:
+windows:
 	mkdir -p build
 	gcc -c ./src/motherboard/motherboard.c -o ./build/motherboard.o
 	gcc -c ./src/cpu/cpu.c -o ./build/cpu.o
