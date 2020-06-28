@@ -1,5 +1,0 @@
-#include "cpu/cpu.c"
-#include "memory/memory.c"
-#include "audio/audio.c"
-#include "motherboard/motherboard.c"
-#include "keyboard/keyboard.c"

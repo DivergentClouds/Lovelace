@@ -1,8 +1,15 @@
 #include "motherboard.h"
-#include "../audio/audio.h"
-#include "../memory/memory.h"
-#include "../cpu/cpu.h"
-#include "../keyboard/keyboard.h"
+
+// definitions
+
+uint8_t should_close = 0;
+uint16_t clock_count = 0;
+
+uint8_t clock_interrupted = 0;
+
+SDL_mutex *fcMutex;
+int fcMutexStatus;
+
 
 void audio_callback(void *data, Uint8 *stream, int len) {
 	float *fstream;
@@ -41,7 +48,7 @@ SDL_AudioDeviceID initialise_audio() {
 	return dev;
 }
 
-int main(int argc, char const **argv) {
+int main(int argc, char **argv) {
 	SDL_AudioDeviceID dev;
 	SDL_Event event;
 

@@ -1,8 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <inttypes.h>
-#include <stdio.h>
+#include "../motherboard/motherboard.h"
 
 typedef struct registers_s {
 	uint8_t r[4];
@@ -20,16 +19,16 @@ typedef struct {
 	uint8_t data; // bitwise
 } cpu_pins_t;
 
-registers_t registers;
-cpu_pins_t cpu_pins;
+extern registers_t registers;
+extern cpu_pins_t cpu_pins;
 
 // states
 
-uint8_t instruction;
-uint8_t stage = 0;
-uint8_t temp[2]; // for load and store
-uint8_t interrupting = 0; // should an interrupt happen
-uint8_t mid_interrupt = 0; // for checking if an interrupt is in progress
+extern uint8_t instruction;
+extern uint8_t stage;
+extern uint8_t hold[2]; // for load and store
+extern uint8_t interrupting; // should an interrupt happen
+extern uint8_t mid_interrupt; // for checking if an interrupt is in progress
 
 // misc functions
 

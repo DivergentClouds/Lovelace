@@ -1,6 +1,15 @@
 #include "cpu.h"
-#include "../motherboard/motherboard.h"
-#include "../memory/memory.h"
+
+// definitions
+uint8_t interrupting = 0;
+uint8_t mid_interrupt = 0;
+
+uint8_t instruction;
+uint8_t stage;
+uint8_t hold[2];
+
+registers_t registers;
+cpu_pins_t cpu_pins;
 
 void do_cpu_cycle() {
 
@@ -73,20 +82,20 @@ void do_cpu_cycle() {
 					stage++;
 					break;
 				case 1:
-					temp[0] = cpu_pins.data; // literal
+					hold[0] = cpu_pins.data; // literal
 					cpu_pins.rw = 1;
 					cpu_pins.address = registers.pc + 2;
 					stage++;
 					break;
 				case 2:
-					temp[1] = cpu_pins.data; // top of address
+					hold[1] = cpu_pins.data; // top of address
 					cpu_pins.rw = 1;
 					cpu_pins.address = registers.pc + 3;
 					stage++;
 					break;
 				case 3:
-					cpu_pins.address = (temp[1] << 8) | cpu_pins.data;
-					cpu_pins.data = temp[0];
+					cpu_pins.address = (hold[1] << 8) | cpu_pins.data;
+					cpu_pins.data = hold[0];
 					cpu_pins.rw = 0;
 					stage++;
 					break;
@@ -104,14 +113,14 @@ void do_cpu_cycle() {
 					stage++;
 					break;
 				case 1:
-					temp[0] = cpu_pins.data; // literal
+					hold[0] = cpu_pins.data; // literal
 					cpu_pins.rw = 1;
 					cpu_pins.address = registers.pc + 2;
 					stage++;
 					break;
 				case 2:
 					cpu_pins.address = cpu_pins.data;
-					cpu_pins.data = temp[0];
+					cpu_pins.data = hold[0];
 					cpu_pins.rw = 0;
 					stage++;
 					break;
@@ -1249,14 +1258,14 @@ void do_load(uint8_t *data) {
 			stage++;
 			break;
 		case 1:
-			temp[0] = cpu_pins.data;
+			hold[0] = cpu_pins.data;
 			cpu_pins.rw = 1;
 			cpu_pins.address = registers.pc + 2;
 			stage++;
 			break;
 		case 2:
 			cpu_pins.rw = 1;
-			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
 			stage++;
 			break;
 		case 3:
@@ -1310,25 +1319,25 @@ void do_load_ind(uint8_t *data) {
 			stage++;
 			break;
 		case 1:
-			temp[0] = cpu_pins.data;
+			hold[0] = cpu_pins.data;
 			cpu_pins.rw = 1;
 			cpu_pins.address = registers.pc + 2;
 			stage++;
 			break;
 		case 2:
 			cpu_pins.rw = 1;
-			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
 			stage++;
 			break;
 		case 3:
-			temp[0] = cpu_pins.data;
+			hold[0] = cpu_pins.data;
 			cpu_pins.rw = 1;
 			cpu_pins.address++;
 			stage++;
 			break;
 		case 4:
 			cpu_pins.rw = 1;
-			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
 			stage++;
 			break;
 		case 5:
@@ -1353,14 +1362,14 @@ void do_load_ind_zp(uint8_t *data) {
 			break;
 		case 2:
 			cpu_pins.rw = 1;
-			temp[0] = cpu_pins.data;
-			//// printf("temp[0] = 0x%x\n", temp[0]);
+			hold[0] = cpu_pins.data;
+			//// printf("hold[0] = 0x%x\n", hold[0]);
 			cpu_pins.address++;
 			stage++;
 			break;
 		case 3:
 			cpu_pins.rw = 1;
-			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
 			stage++;
 			break;
 		case 4:
@@ -1379,14 +1388,14 @@ void do_store(uint8_t data) {
 			stage++;
 			break;
 		case 1:
-			temp[0] = cpu_pins.data;
+			hold[0] = cpu_pins.data;
 			cpu_pins.rw = 1;
 			cpu_pins.address = registers.pc + 2;
 			stage++;
 			break;
 		case 2:
 			cpu_pins.rw = 0;
-			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
 			cpu_pins.data = data;
 			stage++;
 			break;
@@ -1425,25 +1434,25 @@ void do_store_ind(uint8_t data) {
 			stage++;
 			break;
 		case 1:
-			temp[0] = cpu_pins.data;
+			hold[0] = cpu_pins.data;
 			cpu_pins.rw = 1;
 			cpu_pins.address = registers.pc + 2;
 			stage++;
 			break;
 		case 2:
 			cpu_pins.rw = 1;
-			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
 			stage++;
 			break;
 		case 3:
-			temp[0] = cpu_pins.data;
+			hold[0] = cpu_pins.data;
 			cpu_pins.rw = 1;
 			cpu_pins.address++;
 			stage++;
 			break;
 		case 4:
 			cpu_pins.rw = 0;
-			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
 			cpu_pins.data = data;
 			stage++;
 			break;
@@ -1467,14 +1476,14 @@ void do_store_ind_zp(uint8_t data) {
 			stage++;
 			break;
 		case 2:
-			temp[0] = cpu_pins.data;
+			hold[0] = cpu_pins.data;
 			cpu_pins.rw = 1;
 			cpu_pins.address++;
 			stage++;
 			break;
 		case 3:
 			cpu_pins.rw = 0;
-			cpu_pins.address = ((uint16_t) temp[0] << 8) | cpu_pins.data;
+			cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
 			cpu_pins.data = data;
 			stage++;
 			break;

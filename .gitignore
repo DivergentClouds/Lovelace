@@ -2,3 +2,4 @@
 **/*.gch
 debug/
 harriet
+build/

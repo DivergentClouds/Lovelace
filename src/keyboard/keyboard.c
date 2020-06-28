@@ -1,6 +1,10 @@
 #include "keyboard.h"
-#include "../motherboard/motherboard.h"
-#include "../cpu/cpu.h"
+
+// definitions
+
+uint8_t key_states[57];
+uint8_t keyboard_interrupted = 0;
+
 
 void handle_keyboard_event(SDL_Event event) {
 	// const uint8_t *state = SDL_GetKeyboardState(NULL);

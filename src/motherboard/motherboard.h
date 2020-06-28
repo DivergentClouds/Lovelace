@@ -1,10 +1,18 @@
 #ifndef MOTHERBOARD_H
 #define MOTHERBOARD_H
 
+
+#include <stdio.h>
 #include <inttypes.h>
 #include <SDL2/SDL.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+
+#include "../audio/audio.h"
+#include "../memory/memory.h"
+#include "../cpu/cpu.h"
+#include "../keyboard/keyboard.h"
 
 #define SAMPLE_RATE 50000
 #define AUDIO_BUFFER_SIZE 1000
@@ -15,13 +23,13 @@
 
 #define PC_START 0x200
 
-SDL_mutex *fcMutex; //probably change name later
-int fcMutexStatus;
+extern SDL_mutex *fcMutex; //probably change name later
+extern int fcMutexStatus;
 
-uint8_t should_close = 0;
-uint16_t clock_count = 0;
+extern uint8_t should_close;
+extern uint16_t clock_count;
 
-uint8_t clock_interrupted = 0;
+extern uint8_t clock_interrupted;
 
 void audio_callback(void *data, Uint8 *stream, int len);
 

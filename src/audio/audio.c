@@ -1,5 +1,24 @@
 #include "audio.h"
-#include "../motherboard/motherboard.h"
+
+// definitions
+
+oscillator_u oscillators[3];
+audio_pins_t audio_pins;
+
+float phases[3];
+
+const float butterworth_const_1 = 0.5881599776824028f;
+const float butterworth_const_2 = 0.24362383960110814f;
+const float reciprocal_pi_squared = 0.10132118364233778f;
+const float reciprocal_pi = 0.3183098861837907f;
+
+biquad_t lowpass_state[6];
+biquad_t highpass_state[6];
+
+float smooth_volume[3];
+float smooth_low[3];
+float smooth_high[3];
+
 
 // registers
 

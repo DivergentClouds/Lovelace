@@ -1,9 +1,7 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-#include <inttypes.h>
-#include <math.h>
-#include <stdlib.h>
+#include "../motherboard/motherboard.h"
 
 // registers
 
@@ -23,7 +21,7 @@ typedef union {
 	uint8_t registers[8];
 } oscillator_u;
 
-oscillator_u oscillators[3];
+extern oscillator_u oscillators[3];
 
 void reset_registers();
 
@@ -38,7 +36,7 @@ typedef struct {
 	float out;
 } audio_pins_t;
 
-audio_pins_t audio_pins;
+extern audio_pins_t audio_pins;
 
 void reset_pins();
 
@@ -48,7 +46,7 @@ void do_audio_cycle();
 
 // audio samples
 
-float phases[3];
+extern float phases[3];
 
 void generate_sample();
 
@@ -62,15 +60,15 @@ float noise_wave();
 float render_oscillator(uint8_t n);
 
 // -2 * cos(7 / 8 * pi) / pi
-const float butterworth_const_1 = 0.5881599776824028f;
+extern const float butterworth_const_1;
 // -2 * cos(5 / 8 * pi) / pi
-const float butterworth_const_2 = 0.24362383960110814f;
+extern const float butterworth_const_2;
 
 // 1 / pi / pi
-const float reciprocal_pi_squared = 0.10132118364233778f;
+extern const float reciprocal_pi_squared;
 
 // 1 / pi
-const float reciprocal_pi = 0.3183098861837907f;
+extern const float reciprocal_pi;
 
 typedef struct biquad_s {
 	float x1;
@@ -79,14 +77,14 @@ typedef struct biquad_s {
 	float y2;
 } biquad_t;
 
-biquad_t lowpass_state[6];
-biquad_t highpass_state[6];
+extern biquad_t lowpass_state[6];
+extern biquad_t highpass_state[6];
 
 float lowpass(float sample, uint8_t n, uint8_t osc, float butterworth_const);
 float highpass(float sample, uint8_t n, uint8_t osc, float butterworth_const);
 
-float smooth_volume[3];
-float smooth_low[3];
-float smooth_high[3];
+extern float smooth_volume[3];
+extern float smooth_low[3];
+extern float smooth_high[3];
 
 #endif

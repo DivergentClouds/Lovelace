@@ -1,10 +1,10 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include <SDL2/SDL.h>
+#include "../motherboard/motherboard.h"
 
-uint8_t key_states[57];
-uint8_t keyboard_interrupted = 0;
+extern uint8_t key_states[57];
+extern uint8_t keyboard_interrupted;
 
 void handle_keyboard_event(SDL_Event event);
 
