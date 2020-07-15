@@ -10,16 +10,24 @@ uint8_t clock_interrupted = 0;
 SDL_mutex *fcMutex;
 int fcMutexStatus;
 
-
 void audio_callback(void *data, Uint8 *stream, int len) {
 	float *fstream;
 	fstream = (float *) stream;
 	for (int i = 0; i < CYCLES_PER_CALLBACK; i++) {
 		clock_count++;
-		if (clock_count == 40000) {
-			// cpu_pins.interrupt = 1;
-			clock_count = 0;
-			// clock_interrupted = 1;
+		if (clock_count >= 40000) {
+			fcMutexStatus = SDL_TryLockMutex(fcMutex);
+			if (fcMutexStatus == 0) {
+				clock_interrupted = 1;
+				cpu_pins.interrupt = 1;
+				clock_count = 0;
+				SDL_UnlockMutex(fcMutex);
+			} else if (fcMutexStatus == SDL_MUTEX_TIMEDOUT) {
+
+			} else {
+				printf("Failed to lock fcMutex in cpu.c: %s\n", SDL_GetError());
+				should_close = 1;
+			}
 		}
 		do_cpu_cycle();
 		do_controller_cycle(); // memory controller

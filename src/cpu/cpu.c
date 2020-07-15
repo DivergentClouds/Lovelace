@@ -22,13 +22,13 @@ void do_cpu_cycle() {
 			fcMutexStatus = SDL_TryLockMutex(fcMutex);
 			if (fcMutexStatus == 0) {
 				interrupting = 1;
+				SDL_UnlockMutex(fcMutex);
 			} else if (fcMutexStatus == SDL_MUTEX_TIMEDOUT) {
 
 			} else {
 				printf("Failed to lock fcMutex in cpu.c: %s\n", SDL_GetError());
 				should_close = 1;
 			}
-			SDL_UnlockMutex(fcMutex);
 		} else {
 			instruction = cpu_pins.data;
 		}
