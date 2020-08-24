@@ -77,7 +77,7 @@ JMP :label
 - NOP
 	- No operation
 	- Opcodes:
-	- 0x00
+	- 0x01
 		- 1 Cycle
 		- NOP
 - STR \<reg/acc/lit> \<adr/zp>

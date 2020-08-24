@@ -4,7 +4,7 @@ from functools import partial
 
 mnemonics = {
 	"NOP": {
-		"": 0x00
+		"": 0x01
 	},
 	"STR": {
 		"R0 ADR": 0x09,

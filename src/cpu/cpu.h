@@ -70,7 +70,7 @@ void do_interrupt();
 
 // opcodes
 
-#define NOOP 0x00
+#define NOOP 0x01
 
 #define STORE_R0 0x09
 #define STORE_R1 0x0a
