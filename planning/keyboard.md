@@ -5,16 +5,14 @@
 
 - QWERTY
 - Number row
-	- Have numpad map to number row (?)
+ - Have numpad map to number row (?)
 - Lowercase and uppercase
 - Extended ASCII
-	- Extra symbols (0x80-0xFE)
-		- Extended language support is priority
-			- Diacritic characters
-				- Combining pseudo-character (0xFF) that activates subroutine from drivers that moves cursor back one space
-					- Subroutine stored in keyboard bank
-				- Low and high versions of diacritics for lowercase and uppercase letters
-		- Boxes, lines, and borders for remaining characters
+ - Extra symbols (0x80-0xFF)
+   - Typeable by holding down alt
+     - OS will handle this
+     - Not all characters will be typable due to limited keyboard keys
+
 
 ### Interrupts
 
