@@ -29,15 +29,10 @@
 
 ### Text Modes
 
-#### Shared
 - Character tiles reside at bank offset to bank offset + 0x4000
  - Ascii character codes + 128 custom characters
  - Codes 0x00 through 0x01F and code 0x7F are not displayed as they are control characters
 - Text resides at 0xF730 through 0xFF00
 - Foreground colors reside at 0xEF5F through 0xF72F
 - Background colors reside at 0xE78E through 0xEF5E
-
-#### Modes
-- 40 Column
-
 - 80 Column
