@@ -1,4 +1,4 @@
-; $7FFE = number of peripherals + 1
+; $9FFE = number of peripherals + 1
 
 PSH R0
 PSH R1
@@ -6,19 +6,19 @@ PSH R2
 PSH R3
 PSH ACC
 
-LOD $7FFE R0
+LOD $9FFE R0
 
 :LOOP
 
-STR R0 $7FFF
-LOD $8000 R1
+STR R0 $9FFF
+LOD $A000 R1
 
 CMP R1 #0
 BRA Z :SKIP
 
 JSR $FF00
 
-STR #0 $8000
+STR #0 $A000
 
 :SKIP
 DEC R0

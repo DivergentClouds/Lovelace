@@ -3,8 +3,8 @@
 
 #include "../motherboard/motherboard.h"
 
-#define BANK_OFFSET 0x8000
-#define INT_OFFSET 0x8000
+#define BANK_OFFSET 0xA000
+#define INT_OFFSET 0xA000
 
 extern uint8_t bank;
 
