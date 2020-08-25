@@ -19,14 +19,10 @@
 	- `$280`
 	- the address `640`
 
-### Labels (note: not for mini-assembler)
+### Labels
 - Labels can be used in place of an address to jump to where the label was defined
 - Labels are prefixed with `:` and can be accessed anywhere in the file
-- Example:
-	- ```
-:label
-JMP :label
-```
+- Labels must be alone on the line where they are defined
 
 ### Flags
 - S
