@@ -10,6 +10,7 @@ STR		#4 		$A003 	; switch to note register
 STR		#49		$A004	; set note to 49 (C4)
 STR		#3 		$9FFF 	; switch to audio bank
 STR		#7		$A003	; switch to volume register
+LOD		#$A0	ACC
 
 :LOOP
 STR		#1 		$9FFF 	; switch to keyboard bank
@@ -20,6 +21,10 @@ BRAN	Z		:OFF	; if 0 jump to volume off
 
 :ON
 STR		#3 		$9FFF 	; switch to audio bank
+STR		#3 		$A003 	; switch to pulse width register
+ADD		#1
+STR		ACC		$A004
+STR		#7		$A003	; switch to volume register
 STR		#$40	$A004	; set volume to 64
 JMP		:LOOP
 
