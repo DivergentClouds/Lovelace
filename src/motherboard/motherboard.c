@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
 	SDL_PauseAudioDevice(dev, 0);
 
-	SDL_Window *screen = SDL_CreateWindow("Harriet",
+	SDL_Window *screen = SDL_CreateWindow("Lovelace",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		800, 450,
