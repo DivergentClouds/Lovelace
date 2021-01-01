@@ -376,7 +376,7 @@ def compile(source, location=0x0200):
 if __name__ == "__main__":
 	p = argparse.ArgumentParser(description="Assemble Harriet assembly language.")
 	p.add_argument("file", help="an input assembly file")
-	p.add_argument("-o", "--output", default="harriet.o",
+	p.add_argument("-o", "--output", default="lovelace.o",
 		help="the output filename")
 	p.add_argument("-f", "--offset", default="0x0200", type=ast.literal_eval,
 		help="the address offset to use for labels")
