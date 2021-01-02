@@ -1064,7 +1064,7 @@ void do_cpu_cycle() {
 			should_close = 1;
 			stage = 1;
 			break;
-		default:
+		default: // switch to fault
 			registers.pc++;
 		}
 	}
@@ -1599,7 +1599,7 @@ void do_reset() {
 	registers.acc = 0;
 	registers.flags = 0;
 	registers.sp = 0;
-	registers.pc = BANK_OFFSET - 1; // -1 is debug
+	registers.pc = BANK_OFFSET;
 
 	cpu_pins.address = 0;
 	cpu_pins.data = 0;
