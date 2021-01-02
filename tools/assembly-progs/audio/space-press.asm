@@ -3,7 +3,7 @@ STR		#0 		$E002 	; switch to oscillator 0
 STR		#2 		$E003 	; switch to waveform register
 STR		#%00	$E004 	; set to pulse
 STR		#3 		$E003 	; switch to pulse width register
-STR		#$E0	$E004 	; set to 50% (128)
+STR		#80		$E004 	; set to 50% (128)
 STR		#1 		$E003 	; switch to lowpass register
 STR		#100	$E004 	; set to 100
 STR		#4 		$E003 	; switch to note register
