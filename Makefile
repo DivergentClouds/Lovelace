@@ -5,7 +5,7 @@ linux:
 	gcc -Wall -c ./src/memory/memory.c -o ./build/memory.o
 	gcc -Wall -c ./src/audio/audio.c -o ./build/audio.o
 	gcc -Wall -c ./src/keyboard/keyboard.c -o ./build/keyboard.o
-	gcc ./build/motherboard.o ./build/cpu.o ./build/memory.o ./build/audio.o ./build/keyboard.o -lm -lSDL2 -O2 -o ./build/lovelace
+	gcc ./build/motherboard.o ./build/cpu.o ./build/memory.o ./build/audio.o ./build/keyboard.o -lm -lSDL2 -O3 -o ./build/lovelace
 
 windows:
 	mkdir -p build
@@ -14,4 +14,4 @@ windows:
 	gcc -Wall -c ./src/memory/memory.c -o ./build/memory.o
 	gcc -Wall -c ./src/audio/audio.c -o ./build/audio.o
 	gcc -Wall -c ./src/keyboard/keyboard.c -o ./build/keyboard.o
-	gcc ./build/motherboard.o ./build/cpu.o ./build/memory.o ./build/audio.o ./build/keyboard.o -lm `sdl2-config --cflags --libs` -O2 -o ./build/lovelace.exe
+	gcc ./build/motherboard.o ./build/cpu.o ./build/memory.o ./build/audio.o ./build/keyboard.o -lm `sdl2-config --cflags --libs` -O3 -o ./build/lovelace.exe
