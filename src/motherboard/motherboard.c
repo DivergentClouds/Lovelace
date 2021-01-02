@@ -69,13 +69,13 @@ int main(int argc, char **argv) {
 
 	reset_registers();
 	reset_pins();
-	srand(0xBEADED);
+	srand(time(NULL));
 
 	cpu_pins.reset = 1;
 	do_cpu_cycle();
 	cpu_pins.reset = 0;
 
-	memcpy(global_memory + PC_START, preload_program, 0x7DFF);
+	memcpy(global_memory + PC_START, preload_program, INT_OFFSET - PC_START - 1);
 	memcpy(global_memory + INT_OFFSET, preload_ihandler, 0xFE);
 
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) != 0) {
@@ -111,7 +111,6 @@ int main(int argc, char **argv) {
 					handle_keyboard_event(event);
 					break;
 			}
-			// handle keyboard and window events
 		}
 		SDL_Delay(10);
 	}

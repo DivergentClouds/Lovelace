@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 #include "../audio/audio.h"
 #include "../memory/memory.h"
@@ -21,9 +22,7 @@
 #define CPU_UPDATE_FREQ (SAMPLE_RATE / AUDIO_BUFFER_SIZE)
 #define CYCLES_PER_CALLBACK (CPU_SIM_FREQ / CPU_UPDATE_FREQ)
 
-#define PC_START 0x200
-
-extern SDL_mutex *fcMutex; //probably change name later
+extern SDL_mutex *fcMutex; // probably change name later
 extern int fcMutexStatus;
 
 extern uint8_t should_close;
