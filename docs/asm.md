@@ -1,4 +1,4 @@
-# Harriet
+# Lovelace
 ## Assembly
 
 ### Numbers
@@ -56,7 +56,7 @@
 - Anything following a `;` on a line is a comment and is not compiled
 
 ### CPU/ASM Notes
-- HarrietCPU is big-endian system
+- LovelaceCPU is big-endian system
 - Instruction operands are written in form \<source> \<destination>
 - All operands are 8-bit except adr which is 16-bit
 
