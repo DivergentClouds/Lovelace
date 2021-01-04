@@ -2,7 +2,6 @@
 
 // definitions
 uint8_t interrupting = 0;
-uint8_t mid_interrupt = 0;
 
 uint8_t instruction;
 uint8_t stage;
@@ -14,36 +13,33 @@ cpu_pins_t cpu_pins;
 void do_cpu_cycle() {
 
 	if (stage == 0) {
+		// printf("PC: 0x%x\n", registers.pc);
+		// printf("instruction: %x, reset: %d, interrupt: %d, mask flag: %d\n", instruction, cpu_pins.reset, cpu_pins.interrupt, (registers.flags & 0b00100000));
 		if (cpu_pins.reset) {
 			do_reset();
-
-			return;
-		} else if ((cpu_pins.interrupt && !(registers.flags & 0b00100000)) || mid_interrupt) {
-			fcMutexStatus = SDL_TryLockMutex(fcMutex);
-			if (fcMutexStatus == 0) {
-				interrupting = 1;
-				SDL_UnlockMutex(fcMutex);
-			} else if (fcMutexStatus == SDL_MUTEX_TIMEDOUT) {
-
-			} else {
-				printf("Failed to lock fcMutex in cpu.c: %s\n", SDL_GetError());
-				should_close = 1;
-			}
+			cpu_pins.reset = 0;
+		} else if (cpu_pins.interrupt && !(registers.flags & 0b00100000)) {
+			cpu_pins.interrupt = 0;
+			interrupting = 1;
+			// printf("keyboard_interrupted = %d\n", keyboard_interrupted);
 		} else {
 			instruction = cpu_pins.data;
 		}
 	}
 
-    // printf("interrupting %d, stage: %d\n", interrupting, stage);
+    // printf("instruction: %d, interrupting: %d, stage: %d\n", instruction, interrupting, stage);
 
-	if (interrupting && (stage == 0 || mid_interrupt)) {
+	if (interrupting) {
 		do_interrupt();
-		return;
 	} else {
 		// printf("instruction: %x\n", instruction);
 		// printf("program counter: %x\n", registers.pc);
-
+		// if (stage == 0)
+			// printf("instruction: 0x%x, program counter: 0x%x\n", instruction, registers.pc);
 		switch (instruction) {
+		case NOOP:
+			registers.pc++;
+			break;
 		case STORE_IND_R0:
 			do_store_ind(registers.r[0]);
 			break;
@@ -775,6 +771,7 @@ void do_cpu_cycle() {
 		case RETI_0:
 			switch (stage) {
 				case 0:
+					// printf("instruction: 0x%x, program counter: 0x%x\n", instruction, registers.pc);
 					cpu_pins.rw = 1;
 					cpu_pins.address = 0x100 | registers.sp;
 					// printf("sp = 0x%x", registers.sp);
@@ -782,20 +779,21 @@ void do_cpu_cycle() {
 					stage++;
 					break;
 				case 1:
-					registers.pc = cpu_pins.data;
 					cpu_pins.rw = 1;
+					registers.pc = cpu_pins.data;
 					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
 					break;
 				case 2:
-					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
 					cpu_pins.rw = 1;
+					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
 					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
 					break;
 				case 3:
+					// printf("instruction: 0x%x, program counter: 0x%x, sp: %d\n", instruction, registers.pc, registers.sp);
 					registers.flags = cpu_pins.data;
 					stage = 0;
 					break; // interrupts push an already incremented address
@@ -985,6 +983,7 @@ void do_cpu_cycle() {
 			do_bran(0b00000010);
 			break;
 		case BRAN_Z:
+			// printf("R0: 0x%x\n", registers.r[0]);
 			do_bran(0b00000001);
 			break;
 		case JMP_0:
@@ -1055,8 +1054,9 @@ void do_cpu_cycle() {
 			registers.flags &= 0b11111110;
 			registers.pc++;
 			break;
-		case 0xFF: // not for final release
+		default: // switch to fault
 			if (should_close == 0) {
+				printf("instruction = 0x%x\n", instruction);
 				printf("pc = 0x%x\n", registers.pc); // debug
 				printf("address = 0x%x\n", cpu_pins.address); // debug
 				printf("data = 0x%x\n", cpu_pins.data);
@@ -1064,8 +1064,6 @@ void do_cpu_cycle() {
 			should_close = 1;
 			stage = 1;
 			break;
-		default: // switch to fault
-			registers.pc++;
 		}
 	}
 
@@ -1363,7 +1361,7 @@ void do_load_ind_zp(uint8_t *data) {
 		case 2:
 			cpu_pins.rw = 1;
 			hold[0] = cpu_pins.data;
-			//// printf("hold[0] = 0x%x\n", hold[0]);
+			// printf("hold[0] = 0x%x\n", hold[0]);
 			cpu_pins.address++;
 			stage++;
 			break;
@@ -1592,6 +1590,7 @@ void do_compare_lit(uint8_t data) {
 }
 
 void do_reset() {
+	printf("cpu reset\n");
 	registers.r[0] = 0;
 	registers.r[1] = 0;
 	registers.r[2] = 0;
@@ -1606,12 +1605,14 @@ void do_reset() {
 	cpu_pins.interrupt = 0;
 	cpu_pins.rw = 1;
 	cpu_pins.reset = 0;
+
+	instruction = 0x01;
+	stage = 0;
 }
 
 void do_interrupt() {
 	switch (stage) {
 		case 0:
-			mid_interrupt = 1;
 			cpu_pins.rw = 0;
 			registers.sp++;
 			cpu_pins.address = 0x100 | registers.sp;
@@ -1633,9 +1634,8 @@ void do_interrupt() {
 			stage++;
 			break;
 		case 3:
-			registers.pc = 0x7F00;
+			registers.pc = INT_OFFSET;
 			interrupting = 0;
-			mid_interrupt = 0;
 			stage = 0;
 			break;
 	}

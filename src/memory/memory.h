@@ -15,10 +15,10 @@ extern uint8_t global_memory[0xFFFF];
 
 extern uint8_t preload_program[INT_OFFSET - PC_START - 1]; // temp
 
-// 0x7FFE number of device banks + 1
-// 0x7FFF current bank number
+// 0xDFFE number of device banks + rom bank
+// 0xDFFF current bank number
 
-extern uint8_t preload_ihandler[0xFE];
+extern uint8_t preload_ihandler[0xFD];
 
 extern uint8_t keyboard_handler[0x100];
 

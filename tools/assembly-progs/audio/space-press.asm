@@ -21,9 +21,6 @@ BRAN	Z		:OFF	; if 0 jump to volume off
 
 :ON
 STR		#3 		$DFFF 	; switch to audio bank
-STR		#3 		$E003 	; switch to pulse width register
-ADD		#1
-STR		ACC		$E004
 STR		#7		$E003	; switch to volume register
 STR		#$40	$E004	; set volume to 64
 JMP		:LOOP

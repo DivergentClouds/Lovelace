@@ -27,8 +27,7 @@ extern cpu_pins_t cpu_pins;
 extern uint8_t instruction;
 extern uint8_t stage;
 extern uint8_t hold[2]; // for load and store
-extern uint8_t interrupting; // should an interrupt happen
-extern uint8_t mid_interrupt; // for checking if an interrupt is in progress
+extern uint8_t interrupting; // is an interrupt happening
 
 // misc functions
 

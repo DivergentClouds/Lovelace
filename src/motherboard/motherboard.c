@@ -7,32 +7,20 @@ uint16_t clock_count = 0;
 
 uint8_t clock_interrupted = 0;
 
-SDL_mutex *fcMutex;
-int fcMutexStatus;
-
 void audio_callback(void *data, Uint8 *stream, int len) {
 	float *fstream;
 	fstream = (float *) stream;
 	for (int i = 0; i < CYCLES_PER_CALLBACK; i++) {
 		clock_count++;
 		if (clock_count >= 40000) {
-			fcMutexStatus = SDL_TryLockMutex(fcMutex);
-			if (fcMutexStatus == 0) {
-				clock_interrupted = 1;
-				cpu_pins.interrupt = 1;
-				clock_count = 0;
-				SDL_UnlockMutex(fcMutex);
-			} else if (fcMutexStatus == SDL_MUTEX_TIMEDOUT) {
-
-			} else {
-				printf("Failed to lock fcMutex in cpu.c: %s\n", SDL_GetError());
-				should_close = 1;
-			}
+			// printf("clock interrupt happened\n");
+			clock_interrupted = 1;
+			cpu_pins.interrupt = 1;
+			clock_count = 0;
 		}
 		do_cpu_cycle();
 		do_controller_cycle(); // memory controller
 		do_audio_cycle();
-		cpu_pins.interrupt = 0;
 	}
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++) {
 		generate_sample();
@@ -60,23 +48,14 @@ int main(int argc, char **argv) {
 	SDL_AudioDeviceID dev;
 	SDL_Event event;
 
-	fcMutex = SDL_CreateMutex();
-	if (!fcMutex) {
-		fprintf(stderr, "Couldn't create mutex: %s\n", SDL_GetError());
-		should_close = 1;
-	}
-
-
 	reset_registers();
 	reset_pins();
 	srand(time(NULL));
 
 	cpu_pins.reset = 1;
-	do_cpu_cycle();
-	cpu_pins.reset = 0;
 
 	memcpy(global_memory + PC_START, preload_program, INT_OFFSET - PC_START - 1);
-	memcpy(global_memory + INT_OFFSET, preload_ihandler, 0xFE);
+	memcpy(global_memory + INT_OFFSET, preload_ihandler, 0xFD);
 
 	if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO) != 0) {
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -115,8 +94,6 @@ int main(int argc, char **argv) {
 		SDL_Delay(10);
 	}
 
-	SDL_UnlockMutex(fcMutex);
-	SDL_DestroyMutex(fcMutex);
 	SDL_CloseAudioDevice(dev);
 	SDL_DestroyWindow(screen);
 	SDL_Quit();

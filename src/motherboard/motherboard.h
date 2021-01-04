@@ -22,9 +22,6 @@
 #define CPU_UPDATE_FREQ (SAMPLE_RATE / AUDIO_BUFFER_SIZE)
 #define CYCLES_PER_CALLBACK (CPU_SIM_FREQ / CPU_UPDATE_FREQ)
 
-extern SDL_mutex *fcMutex; // probably change name later
-extern int fcMutexStatus;
-
 extern uint8_t should_close;
 extern uint16_t clock_count;
 
