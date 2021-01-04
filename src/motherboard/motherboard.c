@@ -10,19 +10,19 @@ uint8_t clock_interrupted = 0;
 void audio_callback(void *data, Uint8 *stream, int len) {
 	float *fstream;
 	fstream = (float *) stream;
-	for (int i = 0; i < CYCLES_PER_CALLBACK; i++) {
-		clock_count++;
-		if (clock_count >= 40000) {
-			// printf("clock interrupt happened\n");
-			clock_interrupted = 1;
-			cpu_pins.interrupt = 1;
-			clock_count = 0;
-		}
-		do_cpu_cycle();
-		do_controller_cycle(); // memory controller
-		do_audio_cycle();
-	}
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++) {
+		for (int j = 0; j < CYCLES_PER_SAMPLE; j++) {
+			clock_count++;
+			if (clock_count >= 40000) {
+				// printf("clock interrupt happened\n");
+				clock_interrupted = 1;
+				cpu_pins.interrupt = 1;
+				clock_count = 0;
+			}
+			do_cpu_cycle();
+			do_controller_cycle(); // memory controller
+			do_audio_cycle();
+		}
 		generate_sample();
 		fstream[i] = audio_pins.out * 0.75;
 	}

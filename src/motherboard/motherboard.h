@@ -16,11 +16,13 @@
 #include "../keyboard/keyboard.h"
 
 #define SAMPLE_RATE 50000
-#define AUDIO_BUFFER_SIZE 1000
+#define AUDIO_BUFFER_SIZE 250
 
-#define CPU_SIM_FREQ 2000000.0
-#define CPU_UPDATE_FREQ (SAMPLE_RATE / AUDIO_BUFFER_SIZE)
-#define CYCLES_PER_CALLBACK (CPU_SIM_FREQ / CPU_UPDATE_FREQ)
+#define CPU_SIM_FREQ 2000000
+// #define CPU_UPDATE_FREQ (SAMPLE_RATE / AUDIO_BUFFER_SIZE)
+// #define CYCLES_PER_CALLBACK (CPU_SIM_FREQ / CPU_UPDATE_FREQ)
+
+#define CYCLES_PER_SAMPLE (CPU_SIM_FREQ / SAMPLE_RATE)
 
 extern uint8_t should_close;
 extern uint16_t clock_count;
