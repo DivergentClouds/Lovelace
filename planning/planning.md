@@ -1,4 +1,4 @@
-# Harriet Fantasy Computer
+# Lovelace Fantasy Computer
 
 ## Basics
 

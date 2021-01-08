@@ -1,6 +1,6 @@
 # Instruction Set
 
-# Harriet
+# Lovelace
 
 ## Registers
 - `r0`, `r1`, `r2`, `r3` 8-bit general registers

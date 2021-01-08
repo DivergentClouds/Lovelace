@@ -1,8 +1,8 @@
 # Motherboard
 
-# Harriet
+# Lovelace
 
-- 1 Harriet CPU
+- 1 Lovelace CPU
 - 2 MHz clock
 - 1 Memory Controller
  - Includes up to 256 banks, switched via the `0x3FFF` address

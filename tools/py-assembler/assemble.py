@@ -374,7 +374,7 @@ def compile(source, location=0x0200):
 
 
 if __name__ == "__main__":
-	p = argparse.ArgumentParser(description="Assemble Harriet assembly language.")
+	p = argparse.ArgumentParser(description="Assemble Lovelace assembly language.")
 	p.add_argument("file", help="an input assembly file")
 	p.add_argument("-o", "--output", default="lovelace.o",
 		help="the output filename")

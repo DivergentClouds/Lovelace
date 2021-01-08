@@ -1,6 +1,6 @@
 # Audio
 
-# Harriet
+# Lovelace
 
 - 3 oscillators
  - 2 Butterworth filters

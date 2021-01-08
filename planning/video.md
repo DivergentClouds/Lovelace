@@ -1,4 +1,4 @@
-# Harriet
+# Lovelace
 ## Video
 
 ### Graphics Modes

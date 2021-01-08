@@ -1,6 +1,6 @@
 # Memory
 
-# Harriet
+# Lovelace
 
 The general memory layout is as such;
 
