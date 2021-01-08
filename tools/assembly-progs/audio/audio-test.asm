@@ -8,9 +8,6 @@ STR		#4 		$E003 	; switch to note register
 STR		#49		$E004	; set note to 49 (C4)
 STR		#3 		$DFFF 	; switch to audio bank
 STR		#7		$E003	; switch to volume register
-LOD		#$E0	ACC
-
-
 
 STR		#3 		$DFFF 	; switch to audio bank
 STR		#$40	$E004	; set volume to 64

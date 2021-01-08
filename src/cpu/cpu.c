@@ -15,6 +15,9 @@ void do_cpu_cycle() {
 	if (stage == 0) {
 		// printf("PC: 0x%x\n", registers.pc);
 		// printf("instruction: %x, reset: %d, interrupt: %d, mask flag: %d\n", instruction, cpu_pins.reset, cpu_pins.interrupt, (registers.flags & 0b00100000));
+		// if (registers.sp > 0) {
+		// 	printf("PC: 0x%x, instruction: 0x%x\n", registers.pc, instruction);
+		// }
 		if (cpu_pins.reset) {
 			do_reset();
 			cpu_pins.reset = 0;
@@ -691,7 +694,6 @@ void do_cpu_cycle() {
 			break;
 		case DEC_R0:
 			do_dec(0);
-
 			registers.pc++;
 			break;
 		case DEC_R1:
@@ -745,6 +747,51 @@ void do_cpu_cycle() {
 					break;
 			}
 			break;
+		case JSRI_0:
+			switch (stage) {
+				case 0:
+					cpu_pins.rw = 0;
+					cpu_pins.data = (registers.pc + 3) >> 8;
+					registers.sp++;
+					cpu_pins.address = 0x100 | registers.sp;
+					stage++;
+					break;
+				case 1:
+					cpu_pins.rw = 0;
+					cpu_pins.data = registers.pc + 3;
+					registers.sp++;
+					cpu_pins.address = 0x100 | registers.sp;
+					stage++;
+					break;
+				case 2:
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 3:
+					hold[0] = cpu_pins.data;
+					cpu_pins.rw = 1;
+					cpu_pins.address++;
+					stage++;
+					break;
+				case 4:
+					cpu_pins.rw = 1;
+					cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
+					stage++;
+					break;
+				case 5:
+					cpu_pins.rw = 1;
+					cpu_pins.address++;
+					registers.pc = ((uint16_t) cpu_pins.data) << 8;
+					stage++;
+					break;
+				case 6:
+					registers.pc |= cpu_pins.data;
+					// // printf("JSR PC = 0x%x\n", registers.pc);
+					stage = 0;
+					break;
+			}
+			break;
 		case RET_0:
 			switch (stage) {
 				case 0:
@@ -764,7 +811,7 @@ void do_cpu_cycle() {
 				case 2:
 					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
 					stage = 0;
-					// // printf("RET PC = 0x%x\n\n", registers.pc);
+					// printf("RET PC = 0x%x\n\n", registers.pc);
 					break;
 			}
 			break;
@@ -1060,6 +1107,11 @@ void do_cpu_cycle() {
 				printf("pc = 0x%x\n", registers.pc); // debug
 				printf("address = 0x%x\n", cpu_pins.address); // debug
 				printf("data = 0x%x\n", cpu_pins.data);
+				printf("\nstack:\n");
+				while (registers.sp--) {
+					printf("%d: 0x%x\n", registers.sp, global_memory[0x100 | registers.sp]);
+				}
+				printf("\n");
 			}
 			should_close = 1;
 			stage = 1;
