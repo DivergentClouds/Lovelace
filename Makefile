@@ -15,8 +15,8 @@ SRCS = $(shell find ${SRC_DIR} -name *.c)
 SRCS_ = $(shell find ${SRC_DIR} -name *.c -printf "%f ")
 OBJS = $(SRCS_:%.c=$(BUILD_DIR)/%.o)
 
-$(BUILD_DIR)/${TARGET_EXEC}: ${OBJS}
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+linux: ${OBJS}
+	$(CC) $(OBJS) -o $(BUILD_DIR)/${TARGET_EXEC} $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/*/%.c 
 	@mkdir -p $(BUILD_DIR)
