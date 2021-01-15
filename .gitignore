@@ -1,6 +1,6 @@
 .ccls-cache/
 **/*.gch
 debug/
-harriet
+lovelace
 build/
 **/*.o
