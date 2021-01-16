@@ -369,6 +369,7 @@ def compile(source, location=0x0200):
 				map(partial(interpret_argument, instruction=parts[0]), parts[1:])))
 
 	for instruction in instructions:
+		print(instruction)
 		if (instruction[0] != "|"):
 			yield mnemonics[instruction[0]][
 				" ".join(map(partial(interpret_argument,
@@ -405,10 +406,6 @@ def compile(source, location=0x0200):
 	print("\nLiteral Constants:")
 	for i in constants_lit:
 		print(i + " = " + str(hex(parse_number(constants_lit[i]))))
-	print("\nInstructions:")
-	for i in instructions:
-		print(i)
-
 
 if __name__ == "__main__":
 	p = argparse.ArgumentParser(description="Assemble Lovelace assembly language.")
@@ -421,6 +418,8 @@ if __name__ == "__main__":
 	args = p.parse_args()
 	with open(args.file) as f:
 		source = f.read()
+
+	print("\nInstructions:")
 	code = bytes(compile(source, args.offset))
 
 	print("\nBytes:")
