@@ -2,6 +2,9 @@ import argparse
 import ast
 from functools import partial
 
+# TODO:
+#    - MAKE > and < work
+
 mnemonics = {
 	"NOP": {
 		"": 0x01
@@ -298,6 +301,10 @@ def interpret_argument(arg, instruction):
 		return arg
 	elif arg.startswith("#"):
 		return "LIT"
+	elif arg.startswith(">"): # access right byte of label as literal
+		return "LIT"
+	elif arg.startswith("<"): # access left byte of label as literal
+		return "LIT"
 	elif arg[0] in "0123456789$%!":
 		if parse_number(arg) < 256 and instruction in ["STR", "STRI", "LOD", "LODI"]:
 			return "ZP"
@@ -305,8 +312,15 @@ def interpret_argument(arg, instruction):
 			return "ADR"
 	elif arg in ["ACC", "SP", "FLG"]:
 		return arg
+	elif arg in constants_lit:
+		return "LIT"
+	elif arg in constants_adr:
+		if parse_number(constants_adr[arg]) < 256 and instruction in ["STR", "STRI", "LOD", "LODI"]:
+			return "ZP"
+		else:
+			return "ADR"
 	else:
-		raise Exception("Invalid argument")
+		raise Exception("Invalid argument: " + arg)
 
 def argument_size(arg):
 	if arg == "ADR":
@@ -319,10 +333,15 @@ def argument_size(arg):
 
 # Possibly make addresses controlled by floppy controller
 def compile(source, location=0x0200):
+	global constants_lit
+	global constants_adr
+
 	labels = {}
 	instructions = []
 	length = 0
-	constants = {}
+	constants_lit = {}
+	constants_zp = {}
+	constants_adr = {}
 
 	for line in source.split("\n"):
 		parts = line.strip().upper().split(";")[0].split()
@@ -333,8 +352,10 @@ def compile(source, location=0x0200):
 		if parts[0].startswith(":"):
 			assert len(parts) == 1, "Whitespace isn't allowed in label names"
 			labels[parts[0][1:]] = length + location
-		elif parts[0].startswith("DEF"):
-			constants[parts[1]] = parts[2]
+		elif parts[0].startswith("LIT"):
+			constants_lit[parts[1]] = parts[2]
+		elif parts[0].startswith("ADR"):
+			constants_adr[parts[1]] = parts[2]
 		else:
 			if parts[0] == "|":
 				instructions.append(parts)
@@ -342,7 +363,7 @@ def compile(source, location=0x0200):
 					map(partial(interpret_argument, instruction=parts[0]), parts[1:])))
 				continue
 
-			assert parts[0] in mnemonics, "Unrecognized mnemonic"
+			assert (parts[0] in mnemonics), "Unrecognized mnemonic: " + parts[0]
 			instructions.append(parts)
 
 			length += 1 + sum(map(argument_size,
@@ -357,8 +378,10 @@ def compile(source, location=0x0200):
 					instruction=instruction[0]), instruction[1:]))]
 
 		for arg in instruction[1:]:
-			if arg in constants:
-				arg = constants[arg]
+			if arg in constants_lit:
+				arg = constants_lit[arg]
+			if arg in constants_adr:
+				arg = constants_adr[arg]
 			type = interpret_argument(arg, instruction[0])
 			if type == "ADR":
 				if arg[0] == ":":
@@ -370,6 +393,12 @@ def compile(source, location=0x0200):
 			elif type == "ZP":
 				yield parse_number(arg)
 			elif type == "LIT":
+				if arg[0] == ">":
+					literal = labels[arg[1:]] & 0xFF
+				elif arg[0] == "<":
+					literal = (labels[arg[1:]] & 0xFF00) >> 2
+				else:
+					literal = arg[1:]
 				yield parse_number(arg[1:])
 
 
