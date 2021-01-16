@@ -171,14 +171,14 @@ mnemonics = {
 		"R1": 0x91,
 		"R2": 0x92,
 		"R3": 0x93,
-		"LIT": 0x94,
+		"ACC": 0x94,
 	},
 	"DEC": {
 		"R0": 0x95,
 		"R1": 0x96,
 		"R2": 0x97,
 		"R3": 0x98,
-		"LIT": 0x99,
+		"ACC": 0x99,
 	},
 	"PSH": {
 		"R0": 0xa2,
@@ -340,7 +340,6 @@ def compile(source, location=0x0200):
 	instructions = []
 	length = 0
 	constants_lit = {}
-	constants_zp = {}
 	constants_adr = {}
 
 	for line in source.split("\n"):
@@ -370,8 +369,6 @@ def compile(source, location=0x0200):
 				map(partial(interpret_argument, instruction=parts[0]), parts[1:])))
 
 	for instruction in instructions:
-		print(instruction)
-
 		if (instruction[0] != "|"):
 			yield mnemonics[instruction[0]][
 				" ".join(map(partial(interpret_argument,
@@ -393,13 +390,24 @@ def compile(source, location=0x0200):
 			elif type == "ZP":
 				yield parse_number(arg)
 			elif type == "LIT":
-				if arg[0] == ">":
-					literal = labels[arg[1:]] & 0xFF
-				elif arg[0] == "<":
-					literal = (labels[arg[1:]] & 0xFF00) >> 2
+				if arg[0] == "<":
+					yield parse_number(str(labels[arg[2:]] & 0xFF))
+				elif arg[0] == ">":
+					yield parse_number(str((labels[arg[2:]] >> 8) & 0xFF))
 				else:
-					literal = arg[1:]
-				yield parse_number(arg[1:])
+					yield parse_number(arg[1:])
+	print("\nLabels:")
+	for i in labels:
+		print(i + " = " + hex(labels[i]))
+	print("\nAddress Constants:")
+	for i in constants_adr:
+		print(i + " = " + str(hex(parse_number(constants_adr[i]))))
+	print("\nLiteral Constants:")
+	for i in constants_lit:
+		print(i + " = " + str(hex(parse_number(constants_lit[i]))))
+	print("\nInstructions:")
+	for i in instructions:
+		print(i)
 
 
 if __name__ == "__main__":
@@ -413,9 +421,9 @@ if __name__ == "__main__":
 	args = p.parse_args()
 	with open(args.file) as f:
 		source = f.read()
-
 	code = bytes(compile(source, args.offset))
 
-	print("\n0x" + ", 0x".join(code.hex()[i:i+2] for i in range(0, len(code.hex()), 2)))
+	print("\nBytes:")
+	print("0x" + ", 0x".join(code.hex()[i:i+2] for i in range(0, len(code.hex()), 2)))
 	with open(args.output, "wb") as f:
 		f.write(code)
