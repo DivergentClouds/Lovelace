@@ -356,7 +356,7 @@ def compile(source, location=0x0200):
 		elif parts[0].startswith("ADR"):
 			constants_adr[parts[1]] = parts[2]
 		else:
-			if parts[0] == "|":
+			if parts[0] == "BYTES":
 				instructions.append(parts)
 				length += sum(map(argument_size,
 					map(partial(interpret_argument, instruction=parts[0]), parts[1:])))
@@ -370,7 +370,7 @@ def compile(source, location=0x0200):
 
 	for instruction in instructions:
 		print(instruction)
-		if (instruction[0] != "|"):
+		if (instruction[0] != "BYTES"):
 			yield mnemonics[instruction[0]][
 				" ".join(map(partial(interpret_argument,
 					instruction=instruction[0]), instruction[1:]))]
