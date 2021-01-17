@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall
 
 LDFLAGS = -lm -lSDL2 -O3
-LDFLAGS_WIN = -lm `sdl-config --cflags --libs` -O3
+LDFLAGS_WIN = -lm `sdl2-config --cflags --libs` -O3
 
 SRC_DIR = ./src
 BUILD_DIR = ./build
