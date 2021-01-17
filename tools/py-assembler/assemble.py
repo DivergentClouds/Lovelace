@@ -402,10 +402,11 @@ def compile(source, location=0x0200):
 		print(i + " = " + hex(labels[i]))
 	print("\nAddress Constants:")
 	for i in constants_adr:
-		print(i + " = " + str(hex(parse_number(constants_adr[i]))))
+		print(i + " = " + str(constants_adr[i]))
 	print("\nLiteral Constants:")
 	for i in constants_lit:
-		print(i + " = " + str(hex(parse_number(constants_lit[i]))))
+		pass
+		print(i + " = " + str(constants_lit[i]))
 
 if __name__ == "__main__":
 	p = argparse.ArgumentParser(description="Assemble Lovelace assembly language.")

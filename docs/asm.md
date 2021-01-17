@@ -804,3 +804,4 @@
 	- Creates a constant that you can use instead for literals instead of typing the number
 - BYTES \<8-bit value> ...
 	- Inserts arbitrary number of 8-bit values into the bytecode at current location
+	- prefixing the values with `#` is optional
