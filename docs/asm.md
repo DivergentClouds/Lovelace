@@ -23,6 +23,8 @@
 - Labels can be used in place of an address to jump to where the label was defined
 - Labels are prefixed with `:` and can be accessed anywhere in the file
 - Labels must be alone on the line where they are defined
+- You may prefix a label with `>` or `<` to get the most and least significant bytes as a literal respectively
+	- This is before the `:`
 
 ### Flags
 - S
@@ -794,3 +796,12 @@
 		- 0xf4
 			- 1 cycle
 			- CLR Z
+
+### Pseudo-Instructions
+- ADR \<name> \<adr/zp>
+	- Creates a constant that you can use instead for addresses instead of typing the number
+- LIT \<name> \<lit>
+	- Creates a constant that you can use instead for literals instead of typing the number
+- BYTES \<8-bit value> ...
+	- Inserts arbitrary number of 8-bit values into the bytecode at current location
+	- prefixing the values with `#` is optional

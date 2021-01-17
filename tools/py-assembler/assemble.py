@@ -2,6 +2,9 @@ import argparse
 import ast
 from functools import partial
 
+# TODO:
+#    - MAKE > and < work
+
 mnemonics = {
 	"NOP": {
 		"": 0x01
@@ -168,14 +171,14 @@ mnemonics = {
 		"R1": 0x91,
 		"R2": 0x92,
 		"R3": 0x93,
-		"LIT": 0x94,
+		"ACC": 0x94,
 	},
 	"DEC": {
 		"R0": 0x95,
 		"R1": 0x96,
 		"R2": 0x97,
 		"R3": 0x98,
-		"LIT": 0x99,
+		"ACC": 0x99,
 	},
 	"PSH": {
 		"R0": 0xa2,
@@ -298,6 +301,10 @@ def interpret_argument(arg, instruction):
 		return arg
 	elif arg.startswith("#"):
 		return "LIT"
+	elif arg.startswith(">"): # access right byte of label as literal
+		return "LIT"
+	elif arg.startswith("<"): # access left byte of label as literal
+		return "LIT"
 	elif arg[0] in "0123456789$%!":
 		if parse_number(arg) < 256 and instruction in ["STR", "STRI", "LOD", "LODI"]:
 			return "ZP"
@@ -305,8 +312,15 @@ def interpret_argument(arg, instruction):
 			return "ADR"
 	elif arg in ["ACC", "SP", "FLG"]:
 		return arg
+	elif arg in constants_lit:
+		return "LIT"
+	elif arg in constants_adr:
+		if parse_number(constants_adr[arg]) < 256 and instruction in ["STR", "STRI", "LOD", "LODI"]:
+			return "ZP"
+		else:
+			return "ADR"
 	else:
-		raise Exception("Invalid argument")
+		raise Exception("Invalid argument: " + arg)
 
 def argument_size(arg):
 	if arg == "ADR":
@@ -319,10 +333,14 @@ def argument_size(arg):
 
 # Possibly make addresses controlled by floppy controller
 def compile(source, location=0x0200):
+	global constants_lit
+	global constants_adr
+
 	labels = {}
 	instructions = []
 	length = 0
-	constants = {}
+	constants_lit = {}
+	constants_adr = {}
 
 	for line in source.split("\n"):
 		parts = line.strip().upper().split(";")[0].split()
@@ -333,16 +351,18 @@ def compile(source, location=0x0200):
 		if parts[0].startswith(":"):
 			assert len(parts) == 1, "Whitespace isn't allowed in label names"
 			labels[parts[0][1:]] = length + location
-		elif parts[0].startswith("DEF"):
-			constants[parts[1]] = parts[2]
+		elif parts[0].startswith("LIT"):
+			constants_lit[parts[1]] = parts[2]
+		elif parts[0].startswith("ADR"):
+			constants_adr[parts[1]] = parts[2]
 		else:
-			if parts[0] == "|":
+			if parts[0] == "BYTES":
 				instructions.append(parts)
 				length += sum(map(argument_size,
 					map(partial(interpret_argument, instruction=parts[0]), parts[1:])))
 				continue
 
-			assert parts[0] in mnemonics, "Unrecognized mnemonic"
+			assert (parts[0] in mnemonics), "Unrecognized mnemonic: " + parts[0]
 			instructions.append(parts)
 
 			length += 1 + sum(map(argument_size,
@@ -350,15 +370,16 @@ def compile(source, location=0x0200):
 
 	for instruction in instructions:
 		print(instruction)
-
-		if (instruction[0] != "|"):
+		if (instruction[0] != "BYTES"):
 			yield mnemonics[instruction[0]][
 				" ".join(map(partial(interpret_argument,
 					instruction=instruction[0]), instruction[1:]))]
 
 		for arg in instruction[1:]:
-			if arg in constants:
-				arg = constants[arg]
+			if arg in constants_lit:
+				arg = constants_lit[arg]
+			if arg in constants_adr:
+				arg = constants_adr[arg]
 			type = interpret_argument(arg, instruction[0])
 			if type == "ADR":
 				if arg[0] == ":":
@@ -370,8 +391,22 @@ def compile(source, location=0x0200):
 			elif type == "ZP":
 				yield parse_number(arg)
 			elif type == "LIT":
-				yield parse_number(arg[1:])
-
+				if arg[0] == "<":
+					yield parse_number(str(labels[arg[2:]] & 0xFF))
+				elif arg[0] == ">":
+					yield parse_number(str((labels[arg[2:]] >> 8) & 0xFF))
+				else:
+					yield parse_number(arg[1:])
+	print("\nLabels:")
+	for i in labels:
+		print(i + " = " + hex(labels[i]))
+	print("\nAddress Constants:")
+	for i in constants_adr:
+		print(i + " = " + str(constants_adr[i]))
+	print("\nLiteral Constants:")
+	for i in constants_lit:
+		pass
+		print(i + " = " + str(constants_lit[i]))
 
 if __name__ == "__main__":
 	p = argparse.ArgumentParser(description="Assemble Lovelace assembly language.")
@@ -385,8 +420,10 @@ if __name__ == "__main__":
 	with open(args.file) as f:
 		source = f.read()
 
+	print("\nInstructions:")
 	code = bytes(compile(source, args.offset))
 
-	print("\n0x" + ", 0x".join(code.hex()[i:i+2] for i in range(0, len(code.hex()), 2)))
+	print("\nBytes:")
+	print("0x" + ", 0x".join(code.hex()[i:i+2] for i in range(0, len(code.hex()), 2)))
 	with open(args.output, "wb") as f:
 		f.write(code)
