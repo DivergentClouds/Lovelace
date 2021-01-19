@@ -1103,10 +1103,19 @@ void do_cpu_cycle() {
 			break;
 		default: // switch to fault
 			if (should_close == 0) {
+				printf("\n");
 				printf("instruction = 0x%x\n", instruction);
-				printf("pc = 0x%x\n", registers.pc); // debug
-				printf("address = 0x%x\n", cpu_pins.address); // debug
+				printf("address = 0x%x\n", cpu_pins.address);
 				printf("data = 0x%x\n", cpu_pins.data);
+				printf("\nregisters:\n");
+				printf("acc = 0x%x\n", registers.acc);
+				printf("r0 = 0x%x\n", registers.r[0]);
+				printf("r1 = 0x%x\n", registers.r[1]);
+				printf("r2 = 0x%x\n", registers.r[2]);
+				printf("r3 = 0x%x\n", registers.r[3]);
+				printf("flags = 0x%x\n", registers.flags);
+				printf("stack pointer = 0x%x\n", registers.sp);
+				printf("program counter = 0x%x\n", registers.pc);
 				printf("\nstack:\n");
 				while (registers.sp--) {
 					printf("%d: 0x%x\n", registers.sp, global_memory[0x100 | registers.sp]);
