@@ -870,8 +870,8 @@ void do_cpu_cycle() {
 					break;
 				case 1:
 					cpu_pins.rw = 0;
-					registers.sp++;
 					cpu_pins.address = 0x100 | registers.sp;
+					registers.sp++;
 					stage++;
 					break;
 				case 2:
@@ -1107,6 +1107,7 @@ void do_cpu_cycle() {
 				printf("instruction = 0x%x\n", instruction);
 				printf("address = 0x%x\n", cpu_pins.address);
 				printf("data = 0x%x\n", cpu_pins.data);
+
 				printf("\nregisters:\n");
 				printf("acc = 0x%x\n", registers.acc);
 				printf("r0 = 0x%x\n", registers.r[0]);
@@ -1116,10 +1117,13 @@ void do_cpu_cycle() {
 				printf("flags = 0x%x\n", registers.flags);
 				printf("stack pointer = 0x%x\n", registers.sp);
 				printf("program counter = 0x%x\n", registers.pc);
+
 				printf("\nstack:\n");
 				while (registers.sp--) {
 					printf("%d: 0x%x\n", registers.sp, global_memory[0x100 | registers.sp]);
+					;
 				}
+				// printf("%d: 0x%x\n", registers.sp, global_memory[0x100 | registers.sp]);
 				printf("\n");
 			}
 			should_close = 1;
@@ -1650,7 +1654,6 @@ void do_compare_lit(uint8_t data) {
 }
 
 void do_reset() {
-	printf("cpu reset\n");
 	registers.r[0] = 0;
 	registers.r[1] = 0;
 	registers.r[2] = 0;
