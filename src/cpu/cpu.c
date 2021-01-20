@@ -1402,7 +1402,7 @@ void do_load_ind(uint8_t *data) {
 		case 5:
 			stage = 0;
 			*data = cpu_pins.data;
-			registers.pc += 2;
+			registers.pc += 3;
 			break;
 	}
 }
@@ -1422,7 +1422,6 @@ void do_load_ind_zp(uint8_t *data) {
 		case 2:
 			cpu_pins.rw = 1;
 			hold[0] = cpu_pins.data;
-			// printf("hold[0] = 0x%x\n", hold[0]);
 			cpu_pins.address++;
 			stage++;
 			break;
@@ -1517,7 +1516,7 @@ void do_store_ind(uint8_t data) {
 			break;
 		case 5:
 			stage = 0;
-			registers.pc += 2;
+			registers.pc += 3;
 			break;
 	}
 }

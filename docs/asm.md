@@ -117,7 +117,7 @@
 		- 0x14
 			- 3 cycles
 			- STR \<lit> \<zp>
-- STRI \<reg/acc/lit> \<adr/zp>
+- STRI \<reg/acc/lit> \<adr>
 	- Stores data from source operand to address pointed to by destination address
 	- Opcodes:
 		- 0x15
@@ -135,6 +135,9 @@
 		- 0x19
 			- 6 cycles
 			- STRI acc \<adr>
+- STRIZ \<reg/acc/lit> \<zp>
+	- Stores data from source operand to address pointed to by destination zero-page address
+	- Opcodes:
 		- 0x1A
 			- 5 cycles
 			- STRI r0 \<zp>
@@ -198,7 +201,7 @@
 		- 0x2D
 			- 2 cycles
 			- LOD \<lit> acc
-- LODI \<adr/zp> \<reg/acc>
+- LODI \<adr> \<reg/acc>
 	- Loads data from address pointed to by source address into destination register
 	- Opcodes:
 		- 0x2E
@@ -216,6 +219,9 @@
 		- 0x32
 			- 6 cycles
 			- LODI \<adr> acc
+- LODIZ \<zp> \<reg/acc>
+	- Loads data from address pointed to by source zero-page address into destination register
+	- Opcodes:
 		- 0x33
 			- 5 cycles
 			- LODI \<zp> r0

@@ -29,6 +29,7 @@ mnemonics = {
 		"R2 ADR": 0x17,
 		"R3 ADR": 0x18,
 		"ACC ADR": 0x19,
+	}, "STRIZ": {
 		"R0 ZP": 0x1a,
 		"R1 ZP": 0x1b,
 		"R2 ZP": 0x1c,
@@ -58,6 +59,7 @@ mnemonics = {
 		"ADR R2": 0x30,
 		"ADR R3": 0x31,
 		"ADR ACC": 0x32,
+	}, "LODIZ": {
 		"ZP R0": 0x33,
 		"ZP R1": 0x34,
 		"ZP R2": 0x35,
@@ -301,7 +303,7 @@ def interpret_argument(arg, instruction):
 	elif arg.startswith("<"): # access left byte of label as literal
 		return "LIT"
 	elif arg[0] in "0123456789$%!":
-		if parse_number(arg) < 256 and instruction in ["STR", "STRI", "LOD", "LODI"]:
+		if parse_number(arg) < 256 and instruction in ["STR", "STRIZ", "LOD", "LODIZ"]:
 			return "ZP"
 		else:
 			return "ADR"
@@ -310,7 +312,7 @@ def interpret_argument(arg, instruction):
 	elif arg in constants_lit:
 		return "LIT"
 	elif arg in constants_adr:
-		if parse_number(constants_adr[arg]) < 256 and instruction in ["STR", "STRI", "LOD", "LODI"]:
+		if parse_number(constants_adr[arg]) < 256 and instruction in ["STR", "STRI", "LOD", "LODIZ"]:
 			return "ZP"
 		else:
 			return "ADR"
