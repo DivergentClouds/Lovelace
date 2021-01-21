@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
 			switch (event.type) {
 				case SDL_QUIT:
 					printf("Quitting Properly\n"); // debug
-					should_close = 1;
+					do_fault();
 					break;
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
 	SDL_DestroyWindow(screen);
 	SDL_Quit();
 
-	printf("1 if closed successfully: %d \n", should_close); // debug
+	printf("1 if closed successfully: %d\n", should_close); // debug
 
 	return 0;
 }

@@ -66,6 +66,7 @@ void do_compare_lit(uint8_t data);
 
 void do_reset();
 void do_interrupt();
+void do_fault();
 
 // opcodes
 
