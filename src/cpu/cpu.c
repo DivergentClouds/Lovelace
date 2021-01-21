@@ -1139,7 +1139,7 @@ void do_cpu_cycle() {
 				case 1:
 					hold[0] = cpu_pins.data; // top of address
 					cpu_pins.rw = 1;
-					cpu_pins.address = registers.pc + 3;
+					cpu_pins.address = registers.pc + 2;
 					stage++;
 					break;
 				case 2:
