@@ -14,7 +14,7 @@ typedef struct registers_s {
 typedef struct {
 	uint8_t reset;
 	uint8_t interrupt;
-	uint8_t rw;
+	uint8_t rw; // 1 for read, 0 for write
 	uint16_t address; // bitwise
 	uint8_t data; // bitwise
 } cpu_pins_t;
@@ -88,11 +88,13 @@ void do_interrupt();
 #define STORE_IND_R2 0x17
 #define STORE_IND_R3 0x18
 #define STORE_IND_ACC 0x19
+#define STORE_IND_LIT 0x56
 #define STORE_IND_ZP_R0 0x1a
 #define STORE_IND_ZP_R1 0x1b
 #define STORE_IND_ZP_R2 0x1c
 #define STORE_IND_ZP_R3 0x1d
 #define STORE_IND_ZP_ACC 0x1e
+#define STORE_IND_ZP_LIT 0x57
 #define LOAD_R0 0x1f
 #define LOAD_R1 0x20
 #define LOAD_R2 0x21
@@ -113,6 +115,7 @@ void do_interrupt();
 #define LOAD_IND_R2 0x30
 #define LOAD_IND_R3 0x31
 #define LOAD_IND_ACC 0x32
+#define LOAD_IND_LIT 0x56
 #define LOAD_IND_ZP_R0 0x33
 #define LOAD_IND_ZP_R1 0x34
 #define LOAD_IND_ZP_R2 0x35

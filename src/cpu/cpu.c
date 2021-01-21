@@ -58,6 +58,48 @@ void do_cpu_cycle() {
 		case STORE_IND_ACC:
 			do_store_ind(registers.acc);
 			break;
+		case STORE_IND_LIT:
+			switch (stage) {
+				case 0:
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					hold[0] = cpu_pins.data;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 2;
+					stage++;
+					break;
+				case 2:
+					hold[1] = cpu_pins.data; // top of address
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 3;
+					stage++;
+					break;
+				case 3:
+					cpu_pins.rw = 1;
+					cpu_pins.address = ((uint16_t) hold[1] << 8) | cpu_pins.data;
+					stage++;
+					break;
+				case 4:
+					hold[1] = cpu_pins.data;
+					cpu_pins.rw = 1;
+					cpu_pins.address++;
+					stage++;
+					break;
+				case 5:
+					cpu_pins.rw = 0;
+					cpu_pins.address = ((uint16_t) hold[1] << 8) | cpu_pins.data;
+					cpu_pins.data = hold[0];
+					stage++;
+					break;
+				case 6:
+					stage = 0;
+					registers.pc += 4;
+					break;
+			}
+			break;
 		case STORE_IND_ZP_R0:
 			do_store_ind_zp(registers.r[0]);
 			break;
@@ -72,6 +114,42 @@ void do_cpu_cycle() {
 			break;
 		case STORE_IND_ZP_ACC:
 			do_store_ind_zp(registers.acc);
+			break;
+		case STORE_IND_ZP_LIT:
+			switch (stage) {
+				case 0:
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					hold[0] = cpu_pins.data;
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 2;
+					stage++;
+					break;
+				case 2:
+					cpu_pins.rw = 1;
+					cpu_pins.address = cpu_pins.data;
+					stage++;
+					break;
+				case 3:
+					hold[1] = cpu_pins.data;
+					cpu_pins.rw = 1;
+					cpu_pins.address++;
+					stage++;
+					break;
+				case 4:
+					cpu_pins.rw = 0;
+					cpu_pins.address = ((uint16_t) hold[1] << 8) | cpu_pins.data;
+					cpu_pins.data = hold[0];
+					stage++;
+					break;
+				case 5:
+					stage = 0;
+					registers.pc += 3;
+					break;
+			}
 			break;
 		case STORE_LIT:
 			switch (stage) {
@@ -742,7 +820,6 @@ void do_cpu_cycle() {
 					break;
 				case 4:
 					registers.pc |= cpu_pins.data;
-					// // printf("JSR PC = 0x%x\n", registers.pc);
 					stage = 0;
 					break;
 			}
@@ -1049,7 +1126,36 @@ void do_cpu_cycle() {
 				case 2:
 					registers.pc |= cpu_pins.data;
 					stage = 0;
-					// printf("0x%x\n",registers.pc);
+					break;
+			}
+			break;
+		case JMPI_0:
+			switch (stage) {
+				case 0:
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 1;
+					stage++;
+					break;
+				case 1:
+					hold[0] = cpu_pins.data; // top of address
+					cpu_pins.rw = 1;
+					cpu_pins.address = registers.pc + 3;
+					stage++;
+					break;
+				case 2:
+					cpu_pins.rw = 1;
+					cpu_pins.address = ((uint16_t) hold[0] << 8) | cpu_pins.data;
+					stage++;
+					break;
+				case 3:
+					cpu_pins.address++;
+					registers.pc = ((uint16_t) cpu_pins.data) << 8;
+					cpu_pins.rw = 1;
+					stage++;
+					break;
+				case 4:
+					registers.pc |= cpu_pins.data;
+					stage = 0;
 					break;
 			}
 			break;

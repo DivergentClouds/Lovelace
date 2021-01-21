@@ -135,6 +135,9 @@
 		- 0x19
 			- 6 cycles
 			- STRI acc \<adr>
+		- 0x56
+			- 7 cycles
+			- STRI \<lit> \<adr>
 - STRIZ \<reg/acc/lit> \<zp>
 	- Stores data from source operand to address pointed to by destination zero-page address
 	- Opcodes:
@@ -153,6 +156,9 @@
 		- 0x1E
 			- 5 cycles
 			- STRI acc \<zp>
+		- 0x57
+			- 6 cycles
+			- STRIZ \<lit> \<adr>
 - LOD \<lit/adr/zp> \<reg/acc>
 	- Loads data from source operand into destination register
 	- Opcodes:
@@ -734,7 +740,7 @@
 	- Jumps to address pointed to by given address.
 	- Opcodes:
 		- 0xdc
-			- 3 cycles
+			- 5 cycles
 			- JMP \<adr>
 - JSR \<adr>
 	- Pushes the PC to the stack and jumps to the given address.
