@@ -312,7 +312,7 @@ def interpret_argument(arg, instruction):
 	elif arg in constants_lit:
 		return "LIT"
 	elif arg in constants_adr:
-		if parse_number(constants_adr[arg]) < 256 and instruction in ["STR", "STRI", "LOD", "LODIZ"]:
+		if parse_number(constants_adr[arg]) < 256 and instruction in ["STR", "STRIZ", "LOD", "LODIZ"]:
 			return "ZP"
 		else:
 			return "ADR"
