@@ -13,10 +13,10 @@ cpu_pins_t cpu_pins;
 void do_cpu_cycle() {
 
 	if (stage == 0) {
-		// printf("PC: 0x%x\n", registers.pc);
+		// printf("PC: 0x%X\n", registers.pc);
 		// printf("instruction: %x, reset: %d, interrupt: %d, mask flag: %d\n", instruction, cpu_pins.reset, cpu_pins.interrupt, (registers.flags & 0b00100000));
 		// if (registers.sp > 0) {
-		// 	printf("PC: 0x%x, instruction: 0x%x\n", registers.pc, instruction);
+		// 	printf("PC: 0x%X, instruction: 0x%X\n", registers.pc, instruction);
 		// }
 		if (cpu_pins.reset) {
 			do_reset();
@@ -38,7 +38,7 @@ void do_cpu_cycle() {
 		// printf("instruction: %x\n", instruction);
 		// printf("program counter: %x\n", registers.pc);
 		// if (stage == 0)
-			// printf("instruction: 0x%x, program counter: 0x%x\n", instruction, registers.pc);
+			// printf("instruction: 0x%X, program counter: 0x%X\n", instruction, registers.pc);
 		switch (instruction) {
 		case NOOP:
 			registers.pc++;
@@ -785,7 +785,7 @@ void do_cpu_cycle() {
 		case DEC_R3:
 			do_dec(3);
 			registers.pc++;
-			 // // printf("R3 = 0x%x\n", registers.r[3]);
+			 // // printf("R3 = 0x%X\n", registers.r[3]);
 			break;
 		case DEC_ACC:
 			do_sub(1);
@@ -864,7 +864,7 @@ void do_cpu_cycle() {
 					break;
 				case 6:
 					registers.pc |= cpu_pins.data;
-					// // printf("JSR PC = 0x%x\n", registers.pc);
+					// // printf("JSR PC = 0x%X\n", registers.pc);
 					stage = 0;
 					break;
 			}
@@ -880,7 +880,7 @@ void do_cpu_cycle() {
 				case 1:
 					cpu_pins.rw = 1;
 					registers.pc = cpu_pins.data;
-					// // printf("RET PC MSB = 0x%x\n\n", registers.pc);
+					// // printf("RET PC MSB = 0x%X\n\n", registers.pc);
 					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
 					stage++;
@@ -888,17 +888,17 @@ void do_cpu_cycle() {
 				case 2:
 					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
 					stage = 0;
-					// printf("RET PC = 0x%x\n\n", registers.pc);
+					// printf("RET PC = 0x%X\n\n", registers.pc);
 					break;
 			}
 			break;
 		case RETI_0:
 			switch (stage) {
 				case 0:
-					// printf("instruction: 0x%x, program counter: 0x%x\n", instruction, registers.pc);
+					// printf("instruction: 0x%X, program counter: 0x%X\n", instruction, registers.pc);
 					cpu_pins.rw = 1;
 					cpu_pins.address = 0x100 | registers.sp;
-					// printf("sp = 0x%x", registers.sp);
+					// printf("sp = 0x%X", registers.sp);
 					registers.sp--;
 					stage++;
 					break;
@@ -917,7 +917,7 @@ void do_cpu_cycle() {
 					stage++;
 					break;
 				case 3:
-					// printf("instruction: 0x%x, program counter: 0x%x, sp: %d\n", instruction, registers.pc, registers.sp);
+					// printf("instruction: 0x%X, program counter: 0x%X, sp: %d\n", instruction, registers.pc, registers.sp);
 					registers.flags = cpu_pins.data;
 					stage = 0;
 					break; // interrupts push an already incremented address
@@ -954,7 +954,7 @@ void do_cpu_cycle() {
 				case 2:
 					// Time for writing to stack
 					registers.pc += 2;
-					// // printf("PUSH STACK = 0x%x\n", global_memory[0x100 | registers.sp]);
+					// // printf("PUSH STACK = 0x%X\n", global_memory[0x100 | registers.sp]);
 					stage = 0;
 					break;
 			}
@@ -1107,7 +1107,7 @@ void do_cpu_cycle() {
 			do_bran(0b00000010);
 			break;
 		case BRAN_Z:
-			// printf("R0: 0x%x\n", registers.r[0]);
+			// printf("R0: 0x%X\n", registers.r[0]);
 			do_bran(0b00000001);
 			break;
 		case JMP_0:
@@ -1218,36 +1218,48 @@ void do_cpu_cycle() {
 		cpu_pins.rw = 1;
 		cpu_pins.address = registers.pc;
 
-		// // printf("\nPC = 0x%x\n", registers.pc);
-		// // printf("OP = 0x%x\n", instruction);
-		// // printf("R0 = 0x%x\n", registers.r[0]);
-		// // printf("R1 = 0x%x\n", registers.r[1]);
+		// // printf("\nPC = 0x%X\n", registers.pc);
+		// // printf("OP = 0x%X\n", instruction);
+		// // printf("R0 = 0x%X\n", registers.r[0]);
+		// // printf("R1 = 0x%X\n", registers.r[1]);
 	}
 }
 
 void do_fault() {
 	if (should_close == 0) {
-		printf("\n");
-		printf("instruction = 0x%x\n", instruction);
-		printf("address = 0x%x\n", cpu_pins.address);
-		printf("data = 0x%x\n", cpu_pins.data);
+		printf("\nAUDIO STATE:\n");
+		for (uint8_t i = 0; i < 3; i++) {
+			printf("\nOscillator %d:\n", i);
+			printf("Highpass: 0x%X\n", oscillators[i].oscillator.high);
+			printf("Lowpass: 0x%X\n", oscillators[i].oscillator.low);
+			printf("Waveform: 0x%X\n", oscillators[i].oscillator.waveform);
+			printf("Pulse Width: 0x%X\n", oscillators[i].oscillator.width);
+			printf("Note: 0x%X\n", oscillators[i].oscillator.note);
+			printf("Pitch Bend: 0x%X\n", oscillators[i].oscillator.bend);
+			printf("Phase: 0x%X\n", oscillators[i].oscillator.phase);
+			printf("Volume: 0x%X\n", oscillators[i].oscillator.volume);
+		}
+		printf("\n\nCPU STATE:\n");
+		printf("\nLocation:\n");
+		printf("Instruction = 0x%X\n", instruction);
+		printf("Address = 0x%X\n", cpu_pins.address);
+		printf("Data = 0x%X\n", cpu_pins.data);
 
-		printf("\nregisters:\n");
-		printf("acc = 0x%x\n", registers.acc);
-		printf("r0 = 0x%x\n", registers.r[0]);
-		printf("r1 = 0x%x\n", registers.r[1]);
-		printf("r2 = 0x%x\n", registers.r[2]);
-		printf("r3 = 0x%x\n", registers.r[3]);
-		printf("flags = 0x%x\n", registers.flags);
-		printf("stack pointer = 0x%x\n", registers.sp);
-		printf("program counter = 0x%x\n", registers.pc);
+		printf("\nRegisters:\n");
+		printf("ACC = 0x%X\n", registers.acc);
+		printf("R0 = 0x%X\n", registers.r[0]);
+		printf("R1 = 0x%X\n", registers.r[1]);
+		printf("R2 = 0x%X\n", registers.r[2]);
+		printf("R3 = 0x%X\n", registers.r[3]);
+		printf("Flags = 0x%X\n", registers.flags);
+		printf("Stack Pointer = 0x%X\n", registers.sp);
+		printf("Program Counter = 0x%X\n", registers.pc);
 
-		printf("\nstack:\n");
+		printf("\nStack:\n");
 		while (registers.sp--) {
-			printf("%d: 0x%x\n", registers.sp, global_memory[0x100 | registers.sp]);
+			printf("%d: 0x%X\n", registers.sp, global_memory[0x100 | registers.sp]);
 			;
 		}
-		// printf("%d: 0x%x\n", registers.sp, global_memory[0x100 | registers.sp]);
 		printf("\n");
 	}
 	should_close = 1;
@@ -1521,6 +1533,7 @@ void do_load_ind(uint8_t *data) {
 			registers.pc += 3;
 			break;
 	}
+
 }
 
 void do_load_ind_zp(uint8_t *data) {
@@ -1664,7 +1677,7 @@ void do_store_ind_zp(uint8_t data) {
 		case 4:
 			stage = 0;
 			registers.pc += 2;
-			// // printf("R1 = 0x%x\n", registers.r[1]);
+			// // printf("R1 = 0x%X\n", registers.r[1]);
 			break;
 	}
 }
