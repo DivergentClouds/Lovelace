@@ -29,12 +29,14 @@ mnemonics = {
 		"R2 ADR": 0x17,
 		"R3 ADR": 0x18,
 		"ACC ADR": 0x19,
+		"LIT ADR": 0x56,
 	}, "STRIZ": {
 		"R0 ZP": 0x1a,
 		"R1 ZP": 0x1b,
 		"R2 ZP": 0x1c,
 		"R3 ZP": 0x1d,
 		"ACC ZP": 0x1e,
+		"LIT ZP": 0x57,
 	},
 	"LOD": {
 		"ADR R0": 0x1f,
