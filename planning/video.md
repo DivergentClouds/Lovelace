@@ -13,7 +13,7 @@
 - The 4 Draw Palettes are 4 bytes each
 - Palette Tiles reside at bank offset + 0x1E00 and take up 300 bytes
 
-#### Modes
+#### Graphics Modes
 
 - Hi-Color
  - 100 x 75 Resolution
@@ -25,7 +25,7 @@
   - Sections are specified in 5 by 5 tiles
  - 4 pixels per byte, 1 per dibit
 
-### Text Modes
+### Text Mode
 
 - Character tiles reside in video card ROM
  - Ascii character codes + 128 custom characters
