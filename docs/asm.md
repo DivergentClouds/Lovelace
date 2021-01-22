@@ -9,15 +9,15 @@
 	- `#` must come before `$`, `%`, or `!`
 - Examples:
 	- `#$10`
-	- 16 as a literal
+		- 16 as a literal
 	- `#%10`
-	- 2 as a literal
+		- 2 as a literal
 	- `#!10` or `#10`
-	- 10 as a literal
+		- 10 as a literal
 	- `$80`
-	- the address `128`
+		- the address `128`
 	- `$280`
-	- the address `640`
+		- the address `640`
 
 ### Labels
 - Labels can be used in place of an address to jump to where the label was defined
