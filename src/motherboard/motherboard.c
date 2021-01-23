@@ -13,7 +13,7 @@ void audio_callback(void *data, Uint8 *stream, int len) {
 	for (int i = 0; i < AUDIO_BUFFER_SIZE; i++) {
 		for (int j = 0; j < CYCLES_PER_SAMPLE; j++) {
 			clock_count++;
-			if (clock_count >= 40000) {
+			if (clock_count >= CLOCK_INTERRUPT_60HZ) {
 				// printf("clock interrupt happened\n");
 				clock_interrupted = 1;
 				cpu_pins.interrupt = 1;
