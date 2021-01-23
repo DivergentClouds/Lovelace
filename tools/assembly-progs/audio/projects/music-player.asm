@@ -32,7 +32,7 @@
 ; Oscillator for EC is stored in R3
 
 ; BPM to Tempo
-; Tempo = 50/(BPM/60)
+; Tempo = 60/(BPM/60)
 
 ADR BANK_SELECTOR $DFFF
 ADR OSC_SELECTOR $E002
