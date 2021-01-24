@@ -153,7 +153,7 @@ float lowpass(float sample, uint8_t n, uint8_t osc, float butterworth_const) {
 	c2 = cutoff * cutoff;
 	a0 = reciprocal_pi_squared + butterworth_const + c2;
 
-	if (oscillators[osc].oscillator.low == 0) {
+	if (oscillators[osc].oscillator.low == 255) {
 		result = sample;
 	} else {
 		result =
