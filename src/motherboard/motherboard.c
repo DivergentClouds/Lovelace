@@ -45,6 +45,36 @@ SDL_AudioDeviceID initialise_audio() {
 }
 
 int main(int argc, char **argv) {
+	uint32_t filelen;
+
+	if (argc == 2) {
+		FILE *file = fopen(argv[1], "rb");
+
+		if (!file) {
+			fprintf(stderr, "Error: Could not open input file\n");
+			return 3;
+		}
+
+		fseek(file, 0, SEEK_END);
+		filelen = ftell(file);
+		fseek(file, 0, SEEK_SET);
+
+		if (filelen > INT_OFFSET - PC_START - 1) {
+			fprintf(stderr, "Error: File too large, the maximum file size is %d bytes", INT_OFFSET - PC_START - 1);
+			fclose(file);
+			return 4;
+		}
+
+		fread(preload_program, 1, filelen, file);
+		fclose(file);
+	} else if (argc > 2) {
+		fprintf(stderr, "Error: Too many arguments""\n");
+		return 5;
+	} else {
+		fprintf(stderr, "Error: Please supply an input file\n");
+		return 6;
+	}
+
 	SDL_AudioDeviceID dev;
 	SDL_Event event;
 
