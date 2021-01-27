@@ -9,7 +9,7 @@
 	- If the byte is subdivided then the leftmost part comes first
 - Screen resides at the bottom of bank memory
 - Draw Palette resides at bank offset + 0x1800
-- The Draw Palettes is 16 bytes
+- The Draw Palettes are 4 4-byte pallettes
 - Palette Tiles reside at bank offset + 0xC00 and take up 0xBB8 (3000) bytes
 
 #### Graphics Mode
