@@ -4,3 +4,4 @@ debug/
 lovelace
 build/
 **/*.o
+log.txt
