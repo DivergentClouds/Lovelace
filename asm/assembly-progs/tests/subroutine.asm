@@ -1,0 +1,4 @@
+PSH #1
+JSR :SUB
+:SUB
+RETI

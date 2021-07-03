@@ -1,0 +1,5 @@
+LOD #$17 R1
+PSH R1
+LOD #$FF R1
+POP R1
+BYTES #$FD
