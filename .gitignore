@@ -5,4 +5,4 @@ lovelace
 build/
 **/*.o
 log.txt
-tools/assembly-progs/tests/**
+asm/assembly-progs/tests/
