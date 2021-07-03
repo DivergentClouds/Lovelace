@@ -1,8 +1,8 @@
-; $DFFE = number of peripherals + 1
+; $AFFE = number of peripherals + 1
 
-ADR MAX_BANKS $DFFE
-ADR CURRENT_BANK $DFFF
-ADR BANK_OFFSET $E000
+ADR MAX_BANKS $AFFE
+ADR CURRENT_BANK $AFFF
+ADR BANK_OFFSET $B000
 ADR INTERRUPT_ROUTINE $FF00
 
 PSH R0                   ; push all registers onto the stack

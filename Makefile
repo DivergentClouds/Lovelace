@@ -18,7 +18,7 @@ OBJS = $(SRCS_:%.c=$(BUILD_DIR)/%.o)
 linux: ${OBJS}
 	$(CC) $(OBJS) -o $(BUILD_DIR)/${TARGET_EXEC} $(LDFLAGS)
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/*/%.c 
+$(BUILD_DIR)/%.o: $(SRC_DIR)/*/%.c
 	@mkdir -p $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 

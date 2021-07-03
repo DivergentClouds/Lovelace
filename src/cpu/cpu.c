@@ -796,15 +796,15 @@ void do_cpu_cycle() {
 				case 0:
 					cpu_pins.rw = 0;
 					cpu_pins.data = (registers.pc + 3) >> 8;
-					registers.sp++;
 					cpu_pins.address = 0x100 | registers.sp;
+					registers.sp++;
 					stage++;
 					break;
 				case 1:
 					cpu_pins.rw = 0;
 					cpu_pins.data = registers.pc + 3;
-					registers.sp++;
 					cpu_pins.address = 0x100 | registers.sp;
+					registers.sp++;
 					stage++;
 					break;
 				case 2:
@@ -829,15 +829,15 @@ void do_cpu_cycle() {
 				case 0:
 					cpu_pins.rw = 0;
 					cpu_pins.data = (registers.pc + 3) >> 8;
-					registers.sp++;
 					cpu_pins.address = 0x100 | registers.sp;
+					registers.sp++;
 					stage++;
 					break;
 				case 1:
 					cpu_pins.rw = 0;
 					cpu_pins.data = registers.pc + 3;
-					registers.sp++;
 					cpu_pins.address = 0x100 | registers.sp;
+					registers.sp++;
 					stage++;
 					break;
 				case 2:
@@ -873,16 +873,16 @@ void do_cpu_cycle() {
 			switch (stage) {
 				case 0:
 					cpu_pins.rw = 1;
-					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
+					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
 					break;
 				case 1:
 					cpu_pins.rw = 1;
 					registers.pc = cpu_pins.data;
 					// // printf("RET PC MSB = 0x%X\n\n", registers.pc);
-					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
+					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
 					break;
 				case 2:
@@ -897,23 +897,23 @@ void do_cpu_cycle() {
 				case 0:
 					// printf("instruction: 0x%X, program counter: 0x%X\n", instruction, registers.pc);
 					cpu_pins.rw = 1;
+					registers.sp--;
 					cpu_pins.address = 0x100 | registers.sp;
 					// printf("sp = 0x%X", registers.sp);
-					registers.sp--;
 					stage++;
 					break;
 				case 1:
 					cpu_pins.rw = 1;
 					registers.pc = cpu_pins.data;
-					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
+					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
 					break;
 				case 2:
 					cpu_pins.rw = 1;
 					registers.pc |= ((uint16_t) cpu_pins.data) << 8;
-					cpu_pins.address = 0x100 | registers.sp;
 					registers.sp--;
+					cpu_pins.address = 0x100 | registers.sp;
 					stage++;
 					break;
 				case 3:
@@ -1258,7 +1258,6 @@ void do_fault() {
 		printf("\nStack:\n");
 		while (registers.sp--) {
 			printf("%d: 0x%X\n", registers.sp, global_memory[0x100 | registers.sp]);
-			;
 		}
 		printf("\n");
 	}
@@ -1686,9 +1685,9 @@ void do_push(uint8_t data) {
 	switch (stage) {
 		case 0:
 			cpu_pins.rw = 0;
-			registers.sp++;
 			cpu_pins.address = 0x100 | registers.sp;
 			cpu_pins.data = data;
+			registers.sp++;
 			stage++;
 			break;
 		case 1:
@@ -1703,8 +1702,8 @@ void do_pop(uint8_t *data) {
 	switch (stage) {
 		case 0:
 			cpu_pins.rw = 1;
-			cpu_pins.address = 0x100 | registers.sp;
 			registers.sp--;
+			cpu_pins.address = 0x100 | registers.sp;
 			stage++;
 			break;
 		case 1:
@@ -1802,23 +1801,23 @@ void do_interrupt() {
 	switch (stage) {
 		case 0:
 			cpu_pins.rw = 0;
-			registers.sp++;
 			cpu_pins.address = 0x100 | registers.sp;
 			cpu_pins.data = registers.flags;
+			registers.sp++;
 			stage++;
 			break;
 		case 1:
 			cpu_pins.rw = 0;
-			registers.sp++;
 			cpu_pins.address = 0x100 | registers.sp;
 			cpu_pins.data = registers.pc >> 8;
+			registers.sp++;
 			stage++;
 			break;
 		case 2:
 			cpu_pins.rw = 0;
-			registers.sp++;
 			cpu_pins.address = 0x100 | registers.sp;
 			cpu_pins.data = registers.pc;
+			registers.sp++;
 			stage++;
 			break;
 		case 3:

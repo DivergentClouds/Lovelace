@@ -3,7 +3,7 @@
 
 #include "../motherboard/motherboard.h"
 
-#define BANK_OFFSET 0xE000
+#define BANK_OFFSET 0xB000
 #define INT_OFFSET (BANK_OFFSET - 0x100)
 #define PC_START 0x200
 
