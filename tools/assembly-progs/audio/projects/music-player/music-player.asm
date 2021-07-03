@@ -34,10 +34,10 @@
 ; BPM to Tempo
 ; Tempo = 60/(BPM/60)
 
-ADR BANK_SELECTOR $DFFF
-ADR OSC_SELECTOR $E002
-ADR AUDIO_REG_SELECTOR $E003
-ADR AUDIO_REG_VALUE $E004
+ADR BANK_SELECTOR $AFFF
+ADR OSC_SELECTOR $B002
+ADR AUDIO_REG_SELECTOR $B003
+ADR AUDIO_REG_VALUE $B004
 
 LIT AUDIO_BANK #3
 LIT CLOCK_BANK #4
@@ -61,14 +61,14 @@ ADR TEMPO_COUNTER $2                           ; When this equals R2 (where temp
 
 ; Escape codes
 LIT EC_ESCAPE            #$FE                    ; Start an escape code with this
-LIT EC_SONG_END          #$1                     ; End of song, NO ARGUMENTS
+LIT EC_SONG_END          #$FF                    ; End of song, NO ARGUMENTS
 LIT EC_OSC_CHANGE        #$2                     ; Only affects other escape codes
 LIT EC_HIGHPASS          #$3
 LIT EC_LOWPASS           #$4
 LIT EC_WAVEFORM          #$5
 LIT EC_PULSE_WIDTH       #$6
 LIT EC_PHASE             #$7
-LIT EC_TEMPO             #$8                     ; Larger = slower, not mesured in BPM
+LIT EC_TEMPO             #$8                     ; Larger = slower, not measured in BPM
 
 ; Waveforms
 LIT PULSE_WAVE    #%00
@@ -128,7 +128,7 @@ LIT A#6     #83
 LIT B6      #84
 
 ; Error Codes
-LIT CLOSED_SUCCESSFULY     #$00
+LIT SONG_OVER              #$80
 LIT ERROR_BAD_CONTROL_BYTE #$01
 LIT ERROR_DEBUG_1          #$F0
 LIT ERROR_DEBUG_2          #$F1
@@ -139,12 +139,12 @@ LIT ERROR_DEBUG_6          #$F5
 LIT ERROR_DEBUG_7          #$F6
 LIT ERROR_DEBUG_8          #$F7
 LIT ERROR_DEBUG_9          #$F8
-LIT ERROR_DEBUG_10         #$F9
-LIT ERROR_DEBUG_11         #$FA
-LIT ERROR_DEBUG_12         #$FB
-LIT ERROR_DEBUG_13         #$FC
-LIT ERROR_DEBUG_14         #$FD
-LIT ERROR_DEBUG_15         #$FE
+LIT ERROR_DEBUG_A          #$F9
+LIT ERROR_DEBUG_B          #$FA
+LIT ERROR_DEBUG_C          #$FB
+LIT ERROR_DEBUG_D          #$FC
+LIT ERROR_DEBUG_E          #$FD
+LIT ERROR_DEBUG_F          #$FE
 
 SET   I                                          ; Prevent interrupts while working in another bank
 STR   CLOCK_BANK   BANK_SELECTOR                 ; Switch to clock bank
@@ -155,13 +155,10 @@ CLR   I                                          ; Reenable interrupts
 STR   >:NOTES      NOTE_STORAGE_MSB              ; Store location of the notes to be played
 STR   <:NOTES      NOTE_STORAGE_LSB              ; Store location of the notes to be played
 
-
 STR   AUDIO_BANK    BANK_SELECTOR                ; Switch to audio bank
 
 
-
 LODI NOTE_STORAGE_MSB R0                         ; Load current value from :NOTES section
-
 
 :LOOP
 
@@ -171,7 +168,7 @@ BRA Z  :CONTROL
 :PLAY
 LOD TEMPO_COUNTER R1
 CMP R2 R1
-BRA G :PLAY                                      ; Wait until TEMPO_COUNTER is greater than or equal to TEMPO value
+BRAN Z :PLAY                                      ; Wait until TEMPO_COUNTER is greater than or equal to TEMPO value
 
 STR #0 OSC_SELECTOR
 STR NOTE_REG AUDIO_REG_SELECTOR
@@ -207,6 +204,7 @@ STR R0 AUDIO_REG_VALUE
 JSR :NEXT_BYTE
 
 STR #0 TEMPO_COUNTER
+
 JMP :LOOP
 
 :CONTROL
@@ -230,7 +228,7 @@ CMP R0 EC_TEMPO
 BRA Z :TEMPO
 
 PSH ERROR_BAD_CONTROL_BYTE
-JMP :ERROR
+JMP :EXIT
 
 :SONG_END
 STR #0 OSC_SELECTOR
@@ -245,15 +243,16 @@ STR #2 OSC_SELECTOR
 STR VOLUME_REG AUDIO_REG_SELECTOR
 STR #0 AUDIO_REG_VALUE
 
-PSH CLOSED_SUCCESSFULY
-JMP :ERROR
+PSH SONG_OVER
+JMP :EXIT
 
 JMP :SONG_END
 
-:ERROR
+:EXIT
 PSH #$AD                                         ; Magic number to let user know this is a crash
 PSH #$DE
 BYTES $FD                                        ; Invalid opcode, causes crash
+
 
 :OSC_CHANGE
 JSR :NEXT_BYTE
@@ -297,15 +296,15 @@ JMP :LOOP
 JSR :NEXT_BYTE
 STR R3 OSC_SELECTOR
 STR PHASE_REG AUDIO_REG_SELECTOR
-JSR :NEXT_BYTE
 STR R0 AUDIO_REG_VALUE
+JSR :NEXT_BYTE
 JMP :LOOP
 
-:TEMPO                                           ; TODO
+:TEMPO
 JSR :NEXT_BYTE
 TRN R0 R2                                        ; Tempo is stored in R2
-JSR :NEXT_BYTE
 STR R2 TEMPO_COUNTER                             ; Ready the next note to be played
+JSR :NEXT_BYTE
 JMP :LOOP
 
 
@@ -324,16 +323,14 @@ POP  ACC
 RET
 
 
-:CALLBACK
-SET  I                                           ; Make sure callback isn't interrupted with another callback
-PSH  ACC                                         ; Allow ACC and R1 to be used for other things
-PSH  R1
-LOD  TEMPO_COUNTER R1                            ; add to NOTE_STORAGE address including carrying
+:CALLBACK                                         ; PSH/POP not needed as the interrupt handler already does it
+;PSH R1
+SET  I                                            ; Make sure callback isn't interrupted with another callback
+LOD  TEMPO_COUNTER R1                             ; add to NOTE_STORAGE address including carrying
 INC  R1
 STR  R1 TEMPO_COUNTER
-POP  R1
-POP  ACC
 CLR  I
+;POP R1
 RET
 
 :NOTES
@@ -342,7 +339,17 @@ RET
 BYTES EC_ESCAPE EC_OSC_CHANGE #0
 BYTES EC_ESCAPE EC_WAVEFORM TRIANGLE_WAVE
 BYTES EC_ESCAPE EC_LOWPASS #$FF
-BYTES EC_ESCAPE EC_TEMPO #15
+
+BYTES EC_ESCAPE EC_OSC_CHANGE #1
+BYTES EC_ESCAPE EC_WAVEFORM TRIANGLE_WAVE
+BYTES EC_ESCAPE EC_LOWPASS #$FF
+
+BYTES EC_ESCAPE EC_OSC_CHANGE #2
+BYTES EC_ESCAPE EC_WAVEFORM TRIANGLE_WAVE
+BYTES EC_ESCAPE EC_LOWPASS #$FF
+
+BYTES EC_ESCAPE EC_TEMPO #10
+
 BYTES D3 #$80 #$00 NO_NOTE #$00 #$00 NO_NOTE #$00 #$00
 BYTES E3 #$80 #$00 NO_NOTE #$00 #$00 NO_NOTE #$00 #$00
 BYTES F3 #$80 #$00 NO_NOTE #$00 #$00 NO_NOTE #$00 #$00
