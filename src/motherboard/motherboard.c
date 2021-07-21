@@ -94,6 +94,11 @@ int main(int argc, char **argv) {
 
 	dev = initialise_audio();
 
+	if (!dev) {
+		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+		return 1;
+	}
+
 	SDL_PauseAudioDevice(dev, 0);
 
 	SDL_Window *screen = SDL_CreateWindow("Lovelace",
